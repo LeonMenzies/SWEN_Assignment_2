@@ -1,3 +1,5 @@
+package Objects;
+
 public abstract class Move {
 
     int row, col;

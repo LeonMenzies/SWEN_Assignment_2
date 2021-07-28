@@ -1,6 +1,6 @@
-
-import Cells.FreeCell;
-import Cells.PlayerCell;
+import Cells.*;
+import Cards.*;
+import Objects.*;
 
 import java.util.*;
 import java.util.regex.Matcher;
@@ -30,6 +30,10 @@ public class Game {
     }
 
     public static void main(String[] args) {
+
+        Gui g = new Gui();
+        g.setupGui();
+
         Game game = new Game();
         board = new Board(24, 24);
         board.setup();
@@ -115,9 +119,9 @@ public class Game {
 
             //if player has not rolled option is displayed
             if (!p.getRollStatus()) {
-                System.out.println("R(Roll), H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Move)");
+                System.out.println("R(Roll), H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Objects.Move)");
             } else {
-                System.out.println("H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Move)");
+                System.out.println("H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Objects.Move)");
             }
 
             in = input.next().toUpperCase();
@@ -207,7 +211,7 @@ public class Game {
     }
 
     /**
-     * Player is making final guess checks to see if they have won or not
+     * Objects.Player is making final guess checks to see if they have won or not
      *
      * @param guess list of the current guess
      * @return true or false if all the cards match
@@ -419,14 +423,14 @@ public class Game {
     }
 
     /**
-     * Move the the weapon and player the on the board into the estate that the player is making the guess in
+     * Objects.Move the the weapon and player the on the board into the estate that the player is making the guess in
      *
      * @param player player making the guess
      * @param gWhat current weapon card guess
      * @param gWho current player card guess
      */
 
-    public void moveCharacters(Player player, WeaponCard gWhat,CharacterCard gWho){
+    public void moveCharacters(Player player, WeaponCard gWhat, CharacterCard gWho){
 
 
         Player pl;
@@ -553,7 +557,7 @@ public class Game {
 
             //length greater then one cant be a correct character entered
             if (in.length() > 1) {
-                System.out.println("Please enter a Valid Move");
+                System.out.println("Please enter a Valid Objects.Move");
                 in = input.next().toUpperCase();
             }
             //checks to see if input matches pattern if true returns that string
@@ -563,7 +567,7 @@ public class Game {
             if (matchFound) {
                 return in;
             } else {
-                System.out.println("Please enter a Valid Move");
+                System.out.println("Please enter a Valid Objects.Move");
                 in = input.next().toUpperCase();
 
             }

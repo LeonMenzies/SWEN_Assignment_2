@@ -1,5 +1,7 @@
+package Cards;
+
 public class Card implements Cloneable {
-    String name;
+    public String name;
     public Card(String name) {
     this.name = name;
     }

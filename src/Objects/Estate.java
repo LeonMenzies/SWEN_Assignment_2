@@ -1,3 +1,5 @@
+package Objects;
+
 import Cells.Cell;
 import Cells.EstateCell;
 import Cells.PlayerCell;

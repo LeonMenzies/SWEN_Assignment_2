@@ -1,3 +1,6 @@
+package Objects;
+
+import Cards.*;
 import Cells.*;
 
 import java.util.*;
@@ -133,7 +136,7 @@ public class Player extends Move implements Cloneable {
             isValidEstate(b,direction);
 
         } else {
-            System.out.println("Move is not valid");
+            System.out.println("Objects.Move is not valid");
         }
     }
 
@@ -152,7 +155,7 @@ public class Player extends Move implements Cloneable {
 
             Cell newPos = estateIn.containsExit(direction);
             if(newPos != null) {
-                //Move the player to an exit point and remove them from the estate
+                //Objects.Move the player to an exit point and remove them from the estate
                 if (checkVisited(c[newPos.getRow()][newPos.getCol()])) {
                     estateIn.removePlayersInEstate(this);
                     c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name);
@@ -162,11 +165,11 @@ public class Player extends Move implements Cloneable {
                     steps--;
                     estateIn = null;
                 }else{
-                    System.out.println("Move is not valid");
+                    System.out.println("Objects.Move is not valid");
                 }
 
         }else{
-                System.out.println("Move is not valid");
+                System.out.println("Objects.Move is not valid");
             }
     }
 
