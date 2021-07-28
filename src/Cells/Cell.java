@@ -1,0 +1,24 @@
+package Cells;
+
+/***
+ * Cell is an abstract class responsible for all the different cell types that make up the board
+ * It only holds the row and column as information
+ */
+public abstract class Cell {
+    int row, col;
+
+    public Cell(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+    /*
+     * Getters
+     */
+    public int getRow() {
+        return row;
+    }
+
+    public int getCol() {
+        return col;
+    }
+}
