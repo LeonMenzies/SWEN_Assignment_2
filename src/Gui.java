@@ -1,5 +1,6 @@
 import java.awt.*;
 import javax.swing.*;
+import javax.swing.border.LineBorder;
 
 public class Gui {
 
@@ -11,31 +12,37 @@ public class Gui {
     }
 
     public void setupGui() {
-
-        frame = new JFrame();
+        frame = new JFrame("Murder Madness");
         frame.setSize(1000, 1000);
+        frame.setMinimumSize(new Dimension(700, 700));
+        frame.setMaximumSize(new Dimension(1000, 1000));
         frame.setLayout(new BorderLayout());
-
-
 
         //The display of the game state
         JPanel display = new JPanel();
+        display.setLayout(new GridLayout(24, 24));
         frame.add(display, BorderLayout.CENTER);
+
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
+        frame.add(buttons, BorderLayout.PAGE_END);
+
+        JButton roll = new JButton("Roll");
+        JButton showHand = new JButton("Show Hand");
+        JButton guess = new JButton("Make Guess");
+        JButton finalGuess = new JButton("Make Final Guess");
+        JButton endTurn = new JButton("End Turn");
+
+        buttons.add(roll);
+        buttons.add(showHand);
+        buttons.add(guess);
+        buttons.add(finalGuess);
+        buttons.add(endTurn);
 
         addMenu();
 
-        //Buttons
-        JButton roll = new JButton();
-        JButton makeGuess = new JButton();
-        frame.add(roll, BorderLayout.PAGE_END);
-        frame.add(makeGuess, BorderLayout.PAGE_END);
 
-
-        //Create the text field
-        JTextField textInput = new JTextField();
-        frame.add(textInput, BorderLayout.PAGE_END);
-
-        frame.setDefaultCloseOperation(closeDialog());
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setVisible(true);
     }
 
@@ -45,8 +52,8 @@ public class Gui {
         JMenuBar menu = new JMenuBar();
         JMenu options = new JMenu("Options");
 
-        i1=new JMenuItem("Restart");
-        i2=new JMenuItem("Preferences");
+        i1=new JMenuItem("Start");
+        i2=new JMenuItem("Restart");
         i3=new JMenuItem("Quit");
 
 

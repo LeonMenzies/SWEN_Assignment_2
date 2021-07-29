@@ -32,7 +32,6 @@ public class Game {
     public static void main(String[] args) {
 
         Gui g = new Gui();
-        g.setupGui();
 
         Game game = new Game();
         board = new Board(24, 24);
