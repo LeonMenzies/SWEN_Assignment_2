@@ -1,41 +1,62 @@
-
 import java.awt.*;
-        import java.awt.event.*;
-        import javax.swing.*;
+import javax.swing.*;
 
 public class Gui {
 
-    private static class HelloWorldDisplay extends JPanel {
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            g.drawString( "Hello World!", 20, 30 );
-        }
+    private JFrame frame;
+
+
+    public Gui(){
+        setupGui();
     }
 
-    private static class ButtonHandler implements ActionListener {
-        public void actionPerformed(ActionEvent e) {
-            System.exit(0);
-        }
+    public void setupGui() {
+
+        frame = new JFrame();
+        frame.setSize(1000, 1000);
+        frame.setLayout(new BorderLayout());
+
+
+
+        //The display of the game state
+        JPanel display = new JPanel();
+        frame.add(display, BorderLayout.CENTER);
+
+        addMenu();
+
+        //Buttons
+        JButton roll = new JButton();
+        JButton makeGuess = new JButton();
+        frame.add(roll, BorderLayout.PAGE_END);
+        frame.add(makeGuess, BorderLayout.PAGE_END);
+
+
+        //Create the text field
+        JTextField textInput = new JTextField();
+        frame.add(textInput, BorderLayout.PAGE_END);
+
+        frame.setDefaultCloseOperation(closeDialog());
+        frame.setVisible(true);
     }
 
-    public static void setupGui() {
+    public void addMenu(){
+        JMenuItem i1, i2, i3;
 
-        HelloWorldDisplay displayPanel = new HelloWorldDisplay();
-        JButton okButton = new JButton("OK");
-        ButtonHandler listener = new ButtonHandler();
-        okButton.addActionListener(listener);
+        JMenuBar menu = new JMenuBar();
+        JMenu options = new JMenu("Options");
 
-        JPanel content = new JPanel();
-        content.setLayout(new BorderLayout());
-        content.add(displayPanel, BorderLayout.CENTER);
-        content.add(okButton, BorderLayout.SOUTH);
+        i1=new JMenuItem("Restart");
+        i2=new JMenuItem("Preferences");
+        i3=new JMenuItem("Quit");
 
-        JFrame window = new JFrame("GUI Test");
-        window.setContentPane(content);
-        window.setSize(250,100);
-        window.setLocation(100,100);
-        window.setVisible(true);
 
+        options.add(i1); options.add(i2); options.add(i3);
+        menu.add(options);
+        frame.setJMenuBar(menu);
     }
 
+    public int closeDialog(){
+        System.out.println("Closing?");
+        return JFrame.EXIT_ON_CLOSE;
+    }
 }
