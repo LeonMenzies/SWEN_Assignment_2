@@ -1,2 +1,2 @@
-# SWEN_Assignment_1
-First assignment Harry, Terry and Leon
+# SWEN_Assignment_2
+Second assignment Harry, Terry and Leon. Carry on from first assigment but adding gui.
