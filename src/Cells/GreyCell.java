@@ -1,5 +1,7 @@
 package Cells;
 
+import java.awt.*;
+
 /***
  * A grey cell is a cell on the board that a player cannot walk on top of
  */
@@ -10,8 +12,8 @@ public class GreyCell extends Cells.Cell {
      * @param row row of the grey cell
      * @param col col of the grey cell
      */
-    public GreyCell(int row, int col){
-        super(row, col);
+    public GreyCell(int row, int col, Image cellImage){
+        super(row, col, cellImage);
     }
 
     /**

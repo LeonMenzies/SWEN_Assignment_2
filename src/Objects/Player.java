@@ -3,7 +3,9 @@ package Objects;
 import Cards.*;
 import Cells.*;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 import java.util.Random;
 
 /***
@@ -24,13 +26,15 @@ public class Player extends Move implements Cloneable {
     private boolean isOut = false;
     private boolean hasWon = false;
     private boolean hasGuessed = false;
+    private Image cellImage;
 
     private ArrayList<Card> guesses;
     private List<Card> hand;
     private List<Cell> visited;
 
-    public Player(String name, int row, int col) {
+    public Player(String name, int row, int col, Image cellImage) {
         super(row, col);
+        this.cellImage = cellImage;
         this.name = name;
         this.row = row;
         this.col = col;
@@ -71,6 +75,8 @@ public class Player extends Move implements Cloneable {
         }
     }
 
+
+
     /**
      * Method for cloning the player
      *
@@ -78,7 +84,7 @@ public class Player extends Move implements Cloneable {
      */
     @Override
     public Player clone() {
-        Player p = new Player(this.name, this.row, this.col);
+        Player p = new Player(this.name, this.row, this.col, this.cellImage);
         for (Card c : this.hand) {
             p.hand.add(c.clone());
         }
@@ -97,7 +103,7 @@ public class Player extends Move implements Cloneable {
 
             Cell[][] cells = b.getCells();
             Cell playerCell = cells[row][col];
-            cells[row][col] = new FreeCell(row, col);
+            cells[row][col] = new FreeCell(row, col, b.getCellImages().get("__"));
 
             //Add the current cell to a visited arraylist for checking later
             visited.add(b.getCell(row, col));
@@ -158,7 +164,7 @@ public class Player extends Move implements Cloneable {
                 //Objects.Move the player to an exit point and remove them from the estate
                 if (checkVisited(c[newPos.getRow()][newPos.getCol()])) {
                     estateIn.removePlayersInEstate(this);
-                    c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name);
+                    c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name, b.getCellImages().get("__"));
                     b.redrawEstates();
                     this.row = newPos.getRow();
                     this.col = newPos.getCol();
@@ -365,6 +371,10 @@ public class Player extends Move implements Cloneable {
 
     public Estate getEstateIn(){
         return this.estateIn;
+    }
+
+    public Image getCellImage(){
+        return cellImage;
     }
 
     public String getEstateInString() {

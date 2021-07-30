@@ -3,16 +3,26 @@ package Objects;
 import Cells.*;
 
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Pattern;
 
 /***
  * The board class holds all the information about the board including its initial state as well as methods to alter its state
  */
-public class Board {
+public class Board extends JPanel {
 
     Map<String, Estate> estates = new HashMap<>();
+    Map<String, Image> cellImages= new HashMap<>();
+    List<Player> players = new ArrayList<>();
     Cell[][] cells;
+    public final int SIZE = 24;
     public final Pattern EXITCELLPATTERN = Pattern.compile("WV|AV|SV|DV|DH|SH|AM|SM|WP|AP|WC|DC");
 
     // @formatter:off
@@ -47,12 +57,20 @@ public class Board {
     public Board(int width, int height){
         cells = new Cell[width][height];
         //Add all the estates to this board with lists of indexes to free storage cells
-        estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18))));
-        estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18))));
-        estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18))));
-        estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18))));
-        estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17))));
+
+        try {
+
+            estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/normal_estate.png"))));
+            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/normal_estate.png"))));
+            estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
+            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
+            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 9, 10, ImageIO.read(new File("src/resources/long_estate.png"))));
+        }catch(IOException e){
+            System.out.println("Image cannot be found");
+        }
     }
+
+
 
     /**
      * Redraw the estates to update objects inside
@@ -63,10 +81,61 @@ public class Board {
         }
     }
 
+    public void addPlayer(Player p){
+        this.players.add(p);
+    }
+
+    @Override
+    public void paint(Graphics g){
+
+        //paint the cells on the board
+        int xStep = 0;
+        int yStep = 0;
+
+        for(Cell[] c1 : cells){
+            for(Cell c2 : c1){
+                g.drawImage(c2.getCellImage(), xStep, yStep, SIZE, SIZE, null);
+                xStep += SIZE;
+            }
+            xStep = 0;
+            yStep += SIZE;
+        }
+
+        //paint the estates on the board
+        for(Map.Entry<String, Estate> es : estates.entrySet()){
+            Image img = es.getValue().getEstateImg();
+            int imgSize = img.getWidth(null) / 2;
+            g.drawImage(img, es.getValue().getRow() * SIZE, es.getValue().getCol() * SIZE, img.getWidth(null) / 2 , img.getHeight(null) / 2, null);
+        }
+
+        //paint the players on the board
+        for(Player p : players){
+            System.out.println(p);
+            g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
+        }
+    }
+
+    public void loadCellImages(){
+        try{
+            cellImages.put("__", ImageIO.read(new File("src/resources/free_cell.png")));
+            cellImages.put("GC", ImageIO.read(new File("src/resources/grey_cell.png")));
+            cellImages.put("Bert", ImageIO.read(new File("src/resources/player_be.png")));
+            cellImages.put("Lucilla", ImageIO.read(new File("src/resources/player_lu.png")));
+            cellImages.put("Percy", ImageIO.read(new File("src/resources/player_pe.png")));
+            cellImages.put("Malina", ImageIO.read(new File("src/resources/player_ma.png")));
+
+        }catch (IOException e){
+            System.out.println("Invalid cell image");
+        }
+
+    }
+
+
     /**
      * This method sets up the board before the game starts
      */
-    public void setup() {
+    public void setup(){
+        loadCellImages();
         Scanner sc = new Scanner(boardCells).useDelimiter("\\|");
 
         int row = 0;
@@ -77,67 +146,67 @@ public class Board {
             String next = sc.next();
             switch(next) {
                 case "__":
-                    cells[row][col++] = new FreeCell(row, col);
+                    cells[row][col++] = new FreeCell(row, col, cellImages.get("__"));
                     break;
                 case "GC":
-                    cells[row][col++] = new GreyCell(row, col);
+                    cells[row][col++] = new GreyCell(row, col, cellImages.get("GC"));
                     break;
                 case "CC":
-                    EstateCell cc = new EstateCell(row, col,"Calamity", "Castle", false);
+                    EstateCell cc = new EstateCell(row, col,"Calamity", "Castle", false, cellImages.get("__"));
 
                     cells[row][col++] = cc;
                     estates.get("Calamity Door").addCell(cc);
                     break;
                 case "CD":
-                    EstateCell cd = new EstateCell(row, col,"Calamity", "Door", true);
+                    EstateCell cd = new EstateCell(row, col,"Calamity", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = cd;
                     estates.get("Calamity Door").addCell(cd);
                     break;
                 case "PP":
-                    EstateCell pp = new EstateCell(row, col,"Peril", "Palace", false);
+                    EstateCell pp = new EstateCell(row, col,"Peril", "Palace", false, cellImages.get("__"));
 
                     cells[row][col++] = pp;
                     estates.get("Peril Door").addCell(pp);
                     break;
                 case "PD":
-                    EstateCell pd = new EstateCell(row, col,"Peril", "Door", true);
+                    EstateCell pd = new EstateCell(row, col,"Peril", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = pd;
                     estates.get("Peril Door").addCell(pd);
                     break;
                 case "MM":
-                    EstateCell mm = new EstateCell(row, col,"Manic", "Manor", false);
+                    EstateCell mm = new EstateCell(row, col,"Manic", "Manor", false, cellImages.get("__"));
 
                     cells[row][col++] = mm;
                     estates.get("Manic Door").addCell(mm);
                     break;
                 case "MD":
-                    EstateCell md = new EstateCell(row, col,"Manic", "Door", true);
+                    EstateCell md = new EstateCell(row, col,"Manic", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = md;
                     estates.get("Manic Door").addCell(md);
                     break;
                 case "HH":
-                    EstateCell hh = new EstateCell(row, col,"Haunted", "House", false);
+                    EstateCell hh = new EstateCell(row, col,"Haunted", "House", false, cellImages.get("__"));
 
                     cells[row][col++] = hh;
                     estates.get("Haunted Door").addCell(hh);
                     break;
                 case "HD":
-                    EstateCell hd = new EstateCell(row, col,"Haunted", "Door", true);
+                    EstateCell hd = new EstateCell(row, col,"Haunted", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = hd;
                     estates.get("Haunted Door").addCell(hd);
                     break;
                 case "VC":
-                    EstateCell vc = new EstateCell(row, col,"Villa", "Celia", false);
+                    EstateCell vc = new EstateCell(row, col,"Villa", "Celia", false, cellImages.get("__"));
 
                     cells[row][col++] = vc;
                     estates.get("Villa Door").addCell(vc);
                     break;
                 case "VD":
-                    EstateCell vd = new EstateCell(row, col,"Villa", "Door", true);
+                    EstateCell vd = new EstateCell(row, col,"Villa", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = vd;
                     estates.get("Villa Door").addCell(vd);
@@ -146,7 +215,7 @@ public class Board {
 
                     //If the cell is an exit door cell this method add it to the correct estate as well as the exit direction
                     if(EXITCELLPATTERN.matcher(next).find()){
-                        Cell exitCell = new FreeCell(row, col);
+                        Cell exitCell = new FreeCell(row, col, cellImages.get("__"));
                         cells[row][col++] = exitCell;
 
                         String key = next.substring(1, 2);
@@ -176,6 +245,7 @@ public class Board {
                     }
             }
         }
+
     }
 
     /**
@@ -186,6 +256,10 @@ public class Board {
      */
     public void redrawCell(int row, int col, Cell c){
         cells[row][col] = c;
+    }
+
+    public Map<String, Image> getCellImages(){
+        return cellImages;
     }
 
     /*
@@ -201,8 +275,9 @@ public class Board {
     }
 
     public void setPlayer(Player p){
-        cells[p.getRow()][p.getCol()] = new PlayerCell(p.getRow(), p.getCol(), p.getName());
+        cells[p.getRow()][p.getCol()] = new PlayerCell(p.getRow(), p.getCol(), p.getName(), cellImages.get("__"));
     }
+
 
     public Estate getEstate(String name){
         return estates.get(name);

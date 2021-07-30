@@ -2,11 +2,16 @@ import Cells.*;
 import Cards.*;
 import Objects.*;
 
+import javax.swing.*;
+import javax.swing.border.Border;
+import java.awt.*;
+import java.awt.event.*;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Game {
+public class Game implements WindowListener {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<Weapon> weapons = new ArrayList<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
@@ -23,7 +28,23 @@ public class Game {
     Pattern MovePat = Pattern.compile("[RGHFWASDE]");
     Pattern dirPat = Pattern.compile("[WASD]");
 
+    private String[] names;
+    private JTextField textField;
+    private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
+    private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
+    private JPanel dialogPanel;
+    private JTextField player1Name;
+    private JTextField player2Name;
+    private JTextField player3Name;
+    private JTextField player4Name;
+    int count = 0;
+
+
+
+
     private static Board board;
+    private JFrame frame;
+    private static Game game;
 
 
     public Game() {
@@ -31,12 +52,13 @@ public class Game {
 
     public static void main(String[] args) {
 
-        Gui g = new Gui();
 
-        Game game = new Game();
+
         board = new Board(24, 24);
         board.setup();
-        game.playerSetUp();
+        game = new Game();
+
+        game.setupGui();
         game.weaponSetup();
         game.setUpDeck();
         game.generateMurder();
@@ -161,9 +183,9 @@ public class Game {
                 refuteOrder(p);
                 makeGuess(p);
                 refuteCards.clear();
-                clearScreen();
+
                 refute(p.getGuess());
-                clearScreen();
+
                 System.out.println("Please past the tablet back to " + p.getName());
                 input.next();
                 System.out.println("Refute cards are: ");
@@ -200,7 +222,7 @@ public class Game {
             if (in.equals("E") && (p.getSteps() == 0 || !p.getEstateInString().equals("null"))) {
                 p.clearSteps();
                 p.setTurn(false);
-                clearScreen();
+
                 return false;
             } else if(in.equals("E") && (p.getSteps() != 0 || p.getEstateInString().equals("null"))) {
                 System.out.println("You must be in an estate or out of steps to end your turn");
@@ -288,8 +310,7 @@ public class Game {
 
 
             }
-            //clears the screen before the next players refute
-            clearScreen();
+
         }
 
     }
@@ -469,7 +490,7 @@ public class Game {
                             if (board.getCell(i, j) instanceof PlayerCell) {
                                 PlayerCell pc = (PlayerCell) board.getCell(i, j);
                                 if (pc.toString().equals(pl.toString())) {
-                                    board.redrawCell(i, j, new FreeCell(i, j));
+                                    board.redrawCell(i, j, new FreeCell(i, j, board.getCellImages().get("__")));
                                 }
                             }
                         }
@@ -577,29 +598,25 @@ public class Game {
      * Method to set Up the right amount of players in the game either 3 or 4
      * Right amount of players are then added to the player Array for the game
      */
-    public void playerSetUp() {
+    public void playerSetUp(int numPlayers) {
         //scans in a string from the console
-        String numPlayers;
-        do {
-            Scanner input = new Scanner(System.in);
-            System.out.print("Enter the number of Players between 3 & 4: ");
-            numPlayers = input.next();
 
-        } while (!numPlayers.equals("3") && !numPlayers.equals("4"));
 
         //players are then added to the array depending on the amount
-        players.add(new Player("Lucilla", 9, 1));
-        players.add(new Player("Bert", 14, 22));
-        players.add(new Player("Malina", 1, 11));
+        players.add(new Player("Lucilla", 9, 1, board.getCellImages().get("Lucilla")));
+        players.add(new Player("Bert", 14, 22, board.getCellImages().get("Bert")));
+        players.add(new Player("Malina", 1, 11, board.getCellImages().get("Malina")));
 
         //4 player gets added in if necessary
-        if (numPlayers.equals("4")) {
-            players.add(new Player("Percy", 22, 9));
+        if (numPlayers == 4) {
+            players.add(new Player("Percy", 22, 9, board.getCellImages().get("Percy")));
         }
 
+
         for (Player p : players) {
-            board.setPlayer(p);
+            board.addPlayer(p);
         }
+        board.repaint();
 
     }
 
@@ -718,10 +735,234 @@ public class Game {
     /**
      * Clears the console screen so other players can't see what the other players have done
      */
-    public static void clearScreen() {
 
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
+
+
+    public void setupGui() {
+        frame = new JFrame("Murder Madness");
+        frame.setSize(720, 720);
+        frame.setMinimumSize(new Dimension(700, 700));
+        frame.setMaximumSize(new Dimension(1000, 1000));
+        frame.setLayout(new BorderLayout());
+
+        board.setSize(720, 720);
+        frame.add(board, BorderLayout.CENTER);
+        board.repaint();
+
+        board.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mousePressed(MouseEvent e) {
+                super.mousePressed(e);
+
+                int xClick = Math.round(e.getX() / 24);
+                int yClick = Math.round(e.getY() / 24);
+
+
+                if(xClick >= 0 && xClick <= 24 && yClick >= 0 && yClick <= 24){
+
+                    System.out.println(board.getCell(xClick, yClick));
+                }
+            }
+        });
+
+
+        JPanel buttons = new JPanel();
+        buttons.setLayout(new FlowLayout());
+        frame.add(buttons, BorderLayout.PAGE_END);
+
+        JButton roll = new JButton("Roll");
+
+        roll.addActionListener(ev -> {
+            board.repaint();
+        });
+
+        JButton showHand = new JButton("Show Hand");
+        JButton guess = new JButton("Make Guess");
+        JButton finalGuess = new JButton("Make Final Guess");
+        JButton endTurn = new JButton("End Turn");
+
+
+
+        buttons.add(roll);
+        buttons.add(showHand);
+        buttons.add(guess);
+        buttons.add(finalGuess);
+        buttons.add(endTurn);
+
+        addMenu();
+
+        //Create the text field
+        frame.addWindowListener(this);
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setVisible(true);
+    }
+
+    public void addMenu(){
+        JMenuItem i1, i2, i3;
+
+        JMenuBar menu = new JMenuBar();
+        JMenu options = new JMenu("Options");
+
+        i1=new JMenuItem("Start");
+        i2=new JMenuItem("Restart");
+        i3=new JMenuItem("Quit");
+
+
+        options.add(i1); options.add(i2); options.add(i3);
+        menu.add(options);
+        frame.setJMenuBar(menu);
+    }
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+        Object[] options = {"3",
+                "4"};
+        int n = JOptionPane.showOptionDialog(frame,
+                "How many players?",
+                "Players",
+                JOptionPane.YES_NO_OPTION,
+                JOptionPane.QUESTION_MESSAGE,
+                null,
+                options,
+                options[0]);
+
+        if (n == JOptionPane.YES_OPTION) {
+            names = new String[3];
+        } else if (n == JOptionPane.NO_OPTION) {
+            names = new String[4];
+        }
+
+        game.playerSetUp(names.length);
+
+
+
+        dialogPanel = new JPanel(new GridBagLayout());
+
+        Border titleBorder = BorderFactory.createTitledBorder("Player Information");
+        Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+        Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
+        dialogPanel.setBorder(combinedBorder);
+        player1Name = new JTextField(5);
+        player2Name = new JTextField(5);
+        player3Name = new JTextField(5);
+
+        player1Name.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent event) {
+                String content = textField.getText();
+                if (!content.equals("")) {
+                    count++;
+                }
+            }
+        });
+        player2Name.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent event) {
+                String content = textField.getText();
+                if (!content.equals("")) {
+                    count++;
+                }
+            }
+        });
+        player3Name.addKeyListener(new KeyAdapter() {
+            public void keyReleased(KeyEvent event) {
+                String content = textField.getText();
+                if (!content.equals("")) {
+                    count++;
+                }
+            }
+        });
+
+
+
+        dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
+        dialogPanel.add(player1Name, createGbc(1, 0));
+        dialogPanel.add(new JLabel("Player 2 Name:"), createGbc(0, 1));
+        dialogPanel.add(player2Name, createGbc(1, 1));
+        dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
+        dialogPanel.add(player3Name, createGbc(1, 2));
+        if (names.length == 4) {
+            player4Name = new JTextField(5);
+            player4Name.addKeyListener(new KeyAdapter() {
+                public void keyReleased(KeyEvent event) {
+                    String content = textField.getText();
+                    if (!content.equals("")) {
+                        count++;
+                    }
+                }
+            });
+            dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
+            dialogPanel.add(player4Name, createGbc(1, 3));
+        }
+
+        int result = JOptionPane.showConfirmDialog(null, dialogPanel,
+                "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
+
+        if (result == JOptionPane.OK_OPTION) {
+            if(count != names.length){
+                JOptionPane.showMessageDialog(frame,
+                        "All player names must be entered",
+                        "Name's Error",
+                        JOptionPane.ERROR_MESSAGE);
+            }
+        }
+
+    }
+
+    private static GridBagConstraints createGbc(int x, int y) {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.gridx = x;
+        gbc.gridy = y;
+        gbc.gridwidth = 1;
+        gbc.gridheight = 1;
+
+        gbc.anchor = (x == 0) ? GridBagConstraints.WEST : GridBagConstraints.EAST;
+        gbc.fill = (x == 0) ? GridBagConstraints.BOTH
+                : GridBagConstraints.HORIZONTAL;
+
+        gbc.insets = (x == 0) ? WEST_INSETS : EAST_INSETS;
+        gbc.weightx = (x == 0) ? 0.1 : 1.0;
+        gbc.weighty = 1.0;
+        return gbc;
+    }
+
+
+    @Override
+    public void windowClosing(WindowEvent e) {
+
+        int result = JOptionPane.showConfirmDialog(frame,
+                "Do you want to Exit ?", "Exit Confirmation : ",
+                JOptionPane.YES_NO_OPTION);
+        if (result == JOptionPane.YES_OPTION) {
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        } else if (result == JOptionPane.NO_OPTION) {
+            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        }
+
+    }
+
+    @Override
+    public void windowClosed(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowIconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeiconified(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowActivated(WindowEvent e) {
+
+    }
+
+    @Override
+    public void windowDeactivated(WindowEvent e) {
 
     }
 

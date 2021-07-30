@@ -1,5 +1,7 @@
 package Cells;
 
+import java.awt.*;
+
 /***
  * A free cell is any cell a player can walk on
  */
@@ -10,8 +12,8 @@ public class FreeCell extends Cells.Cell {
      * @param row row of the free cell on the board
      * @param col col of the free cell on the board
      */
-    public FreeCell(int row, int col){
-        super(row, col);
+    public FreeCell(int row, int col, Image cellImage){
+        super(row, col, cellImage);
     }
 
 

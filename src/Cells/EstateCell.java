@@ -1,5 +1,7 @@
 package Cells;
 
+import java.awt.*;
+
 /***
  * The estate cell class represents the estates on the board
  */
@@ -9,8 +11,9 @@ public class EstateCell extends Cells.Cell {
     private String nameFirst;
     private String nameSecond;
 
-    public EstateCell(int row, int col, String name1, String name2, Boolean isDoor) {
-        super(row, col);
+
+    public EstateCell(int row, int col, String name1, String name2, Boolean isDoor, Image cellImage) {
+        super(row, col, cellImage);
         this.nameFirst = name1;
         this.nameSecond = name2;
         this.isDoor = isDoor;

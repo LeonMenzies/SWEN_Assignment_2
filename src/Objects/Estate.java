@@ -5,7 +5,9 @@ import Cells.EstateCell;
 import Cells.PlayerCell;
 import Cells.WeaponCell;
 
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 /***
  * The estate class stores the information about the cells the estate is made up of as well as the players and weapons contained in its fields
@@ -18,8 +20,12 @@ public class Estate {
     public List<Cell> cellObjectsInEstate;
     private List<Integer> availableCells;
     private Map<String, Cell> exitCells;
+    private Image estateImg;
+    private int row, col;
 
-    public Estate(String estateName, List<Integer> availableCells) {
+
+
+    public Estate(String estateName, List<Integer> availableCells, int row, int col, Image estateImg) {
         this.playersInEstate = new ArrayList<>();
         this.estateName = estateName;
         this.estateCellList = new ArrayList<>();
@@ -28,6 +34,8 @@ public class Estate {
         this.cellObjectsInEstate = new ArrayList<>();
         this.availableCells = availableCells;
         this.weaponsInEstate = new ArrayList<>();
+        this.estateImg = estateImg;
+        this.row = row; this.col = col;
     }
 
     /**
@@ -55,6 +63,8 @@ public class Estate {
         for(int i = 0; i < playersInEstate.size() + weaponsInEstate.size(); i++){
             b.redrawCell(estateCellList.get(availableCells.get(i)).getRow(), estateCellList.get(availableCells.get(i)).getCol(), cellObjectsInEstate.get(i));
         }
+
+        b.repaint();
     }
 
 
@@ -88,7 +98,7 @@ public class Estate {
      */
     public void addPlayersInEstate(Player pl) {
 
-        this.cellObjectsInEstate.add(new PlayerCell(0,0,pl.getName()));
+        this.cellObjectsInEstate.add(new PlayerCell(0,0,pl.getName(), pl.getCellImage()));
         this.playersInEstate.add(pl);
     }
     /**
@@ -100,7 +110,7 @@ public class Estate {
 
     public void addWeaponInEstate(Weapon wp){
         this.weaponsInEstate.add(wp);
-        this.cellObjectsInEstate.add(new WeaponCell(0, 0, wp.getWepName()));
+        this.cellObjectsInEstate.add(new WeaponCell(0, 0, wp.getWepName(), null ));
         wp.setEstate(this);
 
     }
@@ -162,5 +172,17 @@ public class Estate {
 
     public String getEstateName(){
         return estateName;
+    }
+
+    public int getRow(){
+        return this.row;
+    }
+
+    public int getCol(){
+        return  this.col;
+    }
+
+    public Image getEstateImg(){
+        return this.estateImg;
     }
 }

@@ -1,14 +1,16 @@
 package Cells;
 
+import java.awt.*;
+
 /***
  * THe weapon cell represents a weapon object on the board
  */
 public class WeaponCell extends Cells.Cell{
-    String weaponName;
+    private String weaponName;
 
 
-    public WeaponCell(int row, int col, String weaponName) {
-        super(row, col);
+    public WeaponCell(int row, int col, String weaponName, Image cellImage) {
+        super(row, col, cellImage);
         this.weaponName = weaponName;
     }
 
