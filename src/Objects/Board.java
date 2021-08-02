@@ -120,7 +120,7 @@ public class Board extends JPanel {
 
         //paint the players on the board
         for (Player p : players) {
-            System.out.println(p);
+         //   System.out.println(p);
             g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
         }
     }

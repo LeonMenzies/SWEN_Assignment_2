@@ -1,3 +1,5 @@
+package Main;
+
 import Cells.*;
 import Cards.*;
 import Objects.*;
@@ -31,7 +33,6 @@ public class Game implements WindowListener {
     Pattern dirPat = Pattern.compile("[WASD]");
 
     private String[] names;
-    private JTextField textField;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
     private JPanel dialogPanel;
@@ -40,8 +41,6 @@ public class Game implements WindowListener {
     private JTextField player3Name;
     private JTextField player4Name;
     int count = 0;
-
-
 
 
     private static Board board;
@@ -53,7 +52,6 @@ public class Game implements WindowListener {
     }
 
     public static void main(String[] args) {
-
 
 
         board = new Board(24, 24);
@@ -71,7 +69,7 @@ public class Game implements WindowListener {
 
     /**
      * Starts the game and decides the order in which the plays will start
-     * Game goes until someone has won or all the players are out
+     * Main.Game goes until someone has won or all the players are out
      */
     public void playGame() {
 
@@ -198,7 +196,7 @@ public class Game implements WindowListener {
             } else if (in.equals("G") && p.getGuessStatus() && !p.getEstateInString().equals("null")) {
                 System.out.println("You have already guessed");
 
-            } else if(in.equals("G") && !p.getGuessStatus() && p.getEstateInString().equals("null") ) {
+            } else if (in.equals("G") && !p.getGuessStatus() && p.getEstateInString().equals("null")) {
                 System.out.println("You need to be in an estate to make a guess");
             }
 
@@ -216,7 +214,7 @@ public class Game implements WindowListener {
                     System.out.println("You are out " + p.getName() + " you can't guess or move but can still refute");
                 }
                 return false;
-            } else if(in.equals("F") && !p.getGuessStatus() && p.getEstateInString().equals("null")){
+            } else if (in.equals("F") && !p.getGuessStatus() && p.getEstateInString().equals("null")) {
                 System.out.println("You must be in an estate to make a final guess");
             }
 
@@ -226,7 +224,7 @@ public class Game implements WindowListener {
                 p.setTurn(false);
 
                 return false;
-            } else if(in.equals("E") && (p.getSteps() != 0 || p.getEstateInString().equals("null"))) {
+            } else if (in.equals("E") && (p.getSteps() != 0 || p.getEstateInString().equals("null"))) {
                 System.out.println("You must be in an estate or out of steps to end your turn");
             }
         }
@@ -440,7 +438,7 @@ public class Game implements WindowListener {
         p.addGuess(gWhere);
         p.addGuess(gWhat);
 
-        moveCharacters(p,gWhat,gWho);
+        moveCharacters(p, gWhat, gWho);
 
     }
 
@@ -448,11 +446,11 @@ public class Game implements WindowListener {
      * Objects.Move the the weapon and player the on the board into the estate that the player is making the guess in
      *
      * @param player player making the guess
-     * @param gWhat current weapon card guess
-     * @param gWho current player card guess
+     * @param gWhat  current weapon card guess
+     * @param gWho   current player card guess
      */
 
-    public void moveCharacters(Player player, WeaponCard gWhat, CharacterCard gWho){
+    public void moveCharacters(Player player, WeaponCard gWhat, CharacterCard gWho) {
 
 
         Player pl;
@@ -460,11 +458,11 @@ public class Game implements WindowListener {
         Estate e = player.getEstateIn();
 
         //Goes through the list of weapons finds the one that match's that of the guess removes it from its current estate into the new one
-        for(Weapon w1: board.getWeapons()){
-            if(w1.getWepName().equals(gWhat.getName())){
+        for (Weapon w1 : board.getWeapons()) {
+            if (w1.getWepName().equals(gWhat.getName())) {
 
                 we = w1.getEstate();
-                if(!we.getEstateName().equals(e.getEstateName())) {
+                if (!we.getEstateName().equals(e.getEstateName())) {
                     we.removeWeaponInEstate(w1);
                     e.addWeaponInEstate(w1);
                 }
@@ -474,14 +472,14 @@ public class Game implements WindowListener {
 
         //goes through the list of players finding the one that match's the guess if they are already in an estate removes from that estate and into the new one
         //if they are somewhere on the board goes through the board and replaces them with a free cell
-        for(Player p1 : players) {
+        for (Player p1 : players) {
             if (p1.getName().equals(gWho.getName())) {
                 pl = p1;
 
                 if (pl.getEstateIn() != null) {
 
                     Estate es = pl.getEstateIn();
-                    if(!es.getEstateName().equals(e.getEstateName())){
+                    if (!es.getEstateName().equals(e.getEstateName())) {
                         es.removePlayersInEstate(pl);
                         e.addPlayersInEstate(pl);
                     }
@@ -626,7 +624,7 @@ public class Game implements WindowListener {
      * Generates the Weapons then randomly distributes them through out the estates
      */
 
-    public void weaponSetup(){
+    public void weaponSetup() {
         ArrayList<Weapon> wpList = new ArrayList<>();
         try {
             wpList.add(new Weapon("Broom", 0, 0, null, ImageIO.read(new File("src/resources/weapon_broom.png"))));
@@ -634,13 +632,13 @@ public class Game implements WindowListener {
             wpList.add(new Weapon("Knife", 0, 0, null, ImageIO.read(new File("src/resources/weapon_knife.png"))));
             wpList.add(new Weapon("Shovel", 0, 0, null, ImageIO.read(new File("src/resources/weapon_shovel.png"))));
             wpList.add(new Weapon("iPad", 0, 0, null, ImageIO.read(new File("src/resources/weapon_ipad.png"))));
-        } catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Weapon image not found");
         }
         Collections.shuffle(wpList);
 
         int count = 0;
-        for(Map.Entry<String, Estate> e : board.getEstates().entrySet()){
+        for (Map.Entry<String, Estate> e : board.getEstates().entrySet()) {
             e.getValue().addWeaponInEstate(wpList.get(count));
             wpList.get(count).setEstate(e.getValue());
             count++;
@@ -743,7 +741,6 @@ public class Game implements WindowListener {
      */
 
 
-
     public void setupGui() {
         frame = new JFrame("Murder Madness");
         frame.setSize(720, 720);
@@ -764,7 +761,7 @@ public class Game implements WindowListener {
                 int yClick = Math.round(e.getY() / 24);
 
 
-                if(xClick >= 0 && xClick <= 24 && yClick >= 0 && yClick <= 24){
+                if (xClick >= 0 && xClick <= 24 && yClick >= 0 && yClick <= 24) {
 
                     System.out.println(board.getCell(xClick, yClick));
                 }
@@ -788,7 +785,6 @@ public class Game implements WindowListener {
         JButton endTurn = new JButton("End Turn");
 
 
-
         buttons.add(roll);
         buttons.add(showHand);
         buttons.add(guess);
@@ -804,18 +800,20 @@ public class Game implements WindowListener {
         frame.setVisible(true);
     }
 
-    public void addMenu(){
+    public void addMenu() {
         JMenuItem i1, i2, i3;
 
         JMenuBar menu = new JMenuBar();
         JMenu options = new JMenu("Options");
 
-        i1=new JMenuItem("Start");
-        i2=new JMenuItem("Restart");
-        i3=new JMenuItem("Quit");
+        i1 = new JMenuItem("Start");
+        i2 = new JMenuItem("Restart");
+        i3 = new JMenuItem("Quit");
 
 
-        options.add(i1); options.add(i2); options.add(i3);
+        options.add(i1);
+        options.add(i2);
+        options.add(i3);
         menu.add(options);
         frame.setJMenuBar(menu);
     }
@@ -842,7 +840,6 @@ public class Game implements WindowListener {
         game.playerSetUp(names.length);
 
 
-
         dialogPanel = new JPanel(new GridBagLayout());
 
         Border titleBorder = BorderFactory.createTitledBorder("Player Information");
@@ -853,31 +850,10 @@ public class Game implements WindowListener {
         player2Name = new JTextField(5);
         player3Name = new JTextField(5);
 
-        player1Name.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent event) {
-                String content = textField.getText();
-                if (!content.equals("")) {
-                    count++;
-                }
-            }
-        });
-        player2Name.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent event) {
-                String content = textField.getText();
-                if (!content.equals("")) {
-                    count++;
-                }
-            }
-        });
-        player3Name.addKeyListener(new KeyAdapter() {
-            public void keyReleased(KeyEvent event) {
-                String content = textField.getText();
-                if (!content.equals("")) {
-                    count++;
-                }
-            }
-        });
-
+        JTextFieldChecker JC = new JTextFieldChecker();
+        JC.addTextField(player1Name);
+        JC.addTextField(player2Name);
+        JC.addTextField(player3Name);
 
 
         dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
@@ -888,31 +864,27 @@ public class Game implements WindowListener {
         dialogPanel.add(player3Name, createGbc(1, 2));
         if (names.length == 4) {
             player4Name = new JTextField(5);
-            player4Name.addKeyListener(new KeyAdapter() {
-                public void keyReleased(KeyEvent event) {
-                    String content = textField.getText();
-                    if (!content.equals("")) {
-                        count++;
-                    }
-                }
-            });
+            JC.addTextField(player4Name);
             dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
             dialogPanel.add(player4Name, createGbc(1, 3));
         }
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(null, dialogPanel,
+                    "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
 
-        int result = JOptionPane.showConfirmDialog(null, dialogPanel,
-                "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
-                JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
 
-        if (result == JOptionPane.OK_OPTION) {
-            if(count != names.length){
-                JOptionPane.showMessageDialog(frame,
-                        "All player names must be entered",
-                        "Name's Error",
-                        JOptionPane.ERROR_MESSAGE);
+                if (!JC.isDataEntered()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "All player names must be entered",
+                            "Name's Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }else{
+                    break;
+                }
             }
         }
-
     }
 
     private static GridBagConstraints createGbc(int x, int y) {
