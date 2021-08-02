@@ -29,18 +29,13 @@ public class Game implements WindowListener {
     WeaponCard what = null;
     boolean gameWon = false;
     Player winner = null;
+    Player currentTurn = null;
     Pattern MovePat = Pattern.compile("[RGHFWASDE]");
     Pattern dirPat = Pattern.compile("[WASD]");
 
     private String[] names;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
-    private JPanel dialogPanel;
-    private JTextField player1Name;
-    private JTextField player2Name;
-    private JTextField player3Name;
-    private JTextField player4Name;
-    int count = 0;
 
 
     private static Board board;
@@ -57,13 +52,13 @@ public class Game implements WindowListener {
         board = new Board(24, 24);
         board.setup();
         game = new Game();
-
-        game.setupGui();
-        game.weaponSetup();
         game.setUpDeck();
-        game.generateMurder();
-        game.dealCards();
-        game.playGame();
+        game.setupGui();
+//        game.weaponSetup();
+//
+//        game.generateMurder();
+//        game.dealCards();
+//        game.playGame();
     }
 
 
@@ -85,6 +80,7 @@ public class Game implements WindowListener {
             //loops through the players checking if they are out of have won the game
             for (Player player : players) {
                 if (!player.getIsOut()) {
+                    currentTurn = player;
                     gameWon = playersTurn(player);
                     if (gameWon) {
                         break;
@@ -130,7 +126,7 @@ public class Game implements WindowListener {
                 input.next();
                 p.setTurn(true);
                 p.setRollStatus(false);
-                p.setGuessStatus(false);
+                p.setGuessStatus(true);
                 p.clearVisited();
 
             }
@@ -791,6 +787,8 @@ public class Game implements WindowListener {
         buttons.add(finalGuess);
         buttons.add(endTurn);
 
+        guess.addActionListener(e -> makeGuess());
+
         addMenu();
 
         //Create the text field
@@ -818,6 +816,46 @@ public class Game implements WindowListener {
         frame.setJMenuBar(menu);
     }
 
+    public void makeGuess() {
+
+        ArrayList<Card> buttons = new ArrayList<>();
+        guessDeck.clear();
+        int count = 0;
+        for (Card c : tempDeck) {
+            if (c instanceof EstateCard) {
+                if (!c.getName().equals("Haunted House")) {
+                    continue;
+                }
+            }
+            buttons.add(c);
+
+            guessDeck.add(c.clone());
+            System.out.println(count + ": " + c.getName());
+            count++;
+        }
+        GuessPanel jpane = new GuessPanel(buttons);
+
+
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(null, jpane,
+                    "Please Select three cards", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+
+                if (!jpane.cardCheck()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Select Three Cards",
+                            "Card Error",
+                            JOptionPane.ERROR_MESSAGE);
+                }else{
+                    guessDeck = jpane.selectedCards();
+                    break;
+                }
+            }
+        }
+
+    }
+
     @Override
     public void windowOpened(WindowEvent e) {
         Object[] options = {"3",
@@ -840,15 +878,15 @@ public class Game implements WindowListener {
         game.playerSetUp(names.length);
 
 
-        dialogPanel = new JPanel(new GridBagLayout());
+        JPanel dialogPanel = new JPanel(new GridBagLayout());
 
         Border titleBorder = BorderFactory.createTitledBorder("Player Information");
         Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
         Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
         dialogPanel.setBorder(combinedBorder);
-        player1Name = new JTextField(5);
-        player2Name = new JTextField(5);
-        player3Name = new JTextField(5);
+        JTextField player1Name = new JTextField(5);
+        JTextField player2Name = new JTextField(5);
+        JTextField player3Name = new JTextField(5);
 
         JTextFieldChecker JC = new JTextFieldChecker();
         JC.addTextField(player1Name);
@@ -863,7 +901,7 @@ public class Game implements WindowListener {
         dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
         dialogPanel.add(player3Name, createGbc(1, 2));
         if (names.length == 4) {
-            player4Name = new JTextField(5);
+            JTextField player4Name = new JTextField(5);
             JC.addTextField(player4Name);
             dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
             dialogPanel.add(player4Name, createGbc(1, 3));
