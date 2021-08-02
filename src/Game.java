@@ -2,10 +2,13 @@ import Cells.*;
 import Cards.*;
 import Objects.*;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.File;
+import java.io.IOException;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -13,7 +16,6 @@ import java.util.regex.Pattern;
 
 public class Game implements WindowListener {
     ArrayList<Player> players = new ArrayList<>();
-    ArrayList<Weapon> weapons = new ArrayList<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
     ArrayList<Card> deck = new ArrayList<>();
     ArrayList<Card> tempDeck = new ArrayList<>();
@@ -458,7 +460,7 @@ public class Game implements WindowListener {
         Estate e = player.getEstateIn();
 
         //Goes through the list of weapons finds the one that match's that of the guess removes it from its current estate into the new one
-        for(Weapon w1: weapons){
+        for(Weapon w1: board.getWeapons()){
             if(w1.getWepName().equals(gWhat.getName())){
 
                 we = w1.getEstate();
@@ -501,7 +503,7 @@ public class Game implements WindowListener {
             }
         }
 
-        board.redrawEstates();
+        board.repaint();
 
     }
 
@@ -625,21 +627,25 @@ public class Game implements WindowListener {
      */
 
     public void weaponSetup(){
-        weapons.add(new Weapon("Broom", 0, 0,null));
-        weapons.add(new Weapon("Scissors", 0, 0,null));
-        weapons.add(new Weapon("Knife", 0, 0,null));
-        weapons.add(new Weapon("Shovel", 0, 0,null));
-        weapons.add(new Weapon("iPad", 0, 0,null));
-
-        Collections.shuffle(weapons);
+        ArrayList<Weapon> wpList = new ArrayList<>();
+        try {
+            wpList.add(new Weapon("Broom", 0, 0, null, ImageIO.read(new File("src/resources/weapon_broom.png"))));
+            wpList.add(new Weapon("Scissors", 0, 0, null, ImageIO.read(new File("src/resources/weapon_scissors.png"))));
+            wpList.add(new Weapon("Knife", 0, 0, null, ImageIO.read(new File("src/resources/weapon_knife.png"))));
+            wpList.add(new Weapon("Shovel", 0, 0, null, ImageIO.read(new File("src/resources/weapon_shovel.png"))));
+            wpList.add(new Weapon("iPad", 0, 0, null, ImageIO.read(new File("src/resources/weapon_ipad.png"))));
+        } catch(IOException e){
+            System.out.println("Weapon image not found");
+        }
+        Collections.shuffle(wpList);
 
         int count = 0;
         for(Map.Entry<String, Estate> e : board.getEstates().entrySet()){
-            e.getValue().addWeaponInEstate(weapons.get(count));
-            weapons.get(count).setEstate(e.getValue());
+            e.getValue().addWeaponInEstate(wpList.get(count));
+            wpList.get(count).setEstate(e.getValue());
             count++;
         }
-        board.redrawEstates();
+        board.addWeapons(wpList);
     }
 
     /**

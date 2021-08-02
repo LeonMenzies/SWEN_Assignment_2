@@ -19,7 +19,8 @@ import java.util.regex.Pattern;
 public class Board extends JPanel {
 
     Map<String, Estate> estates = new HashMap<>();
-    Map<String, Image> cellImages= new HashMap<>();
+    Map<String, Image> cellImages = new HashMap<>();
+    ArrayList<Weapon> weapons = new ArrayList<>();
     List<Player> players = new ArrayList<>();
     Cell[][] cells;
     public final int SIZE = 24;
@@ -28,33 +29,33 @@ public class Board extends JPanel {
     // @formatter:off
     String boardCells =
             "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
-            "|__|__|HH|HH|HH|HH|HD|DH|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
-            "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
-            "|__|__|HH|HH|HH|HH|HH|__|__|__|__|GC|GC|__|__|__|AM|MD|MM|MM|MM|MM|__|__|\n" +
-            "|__|__|HH|HH|HH|HD|HH|__|__|__|__|GC|GC|__|__|__|__|MM|MM|MM|MD|MM|__|__|\n" +
-            "|__|__|__|__|__|SH|__|__|__|__|__|__|__|__|__|__|__|__|__|__|SM|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|WV|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|VC|VC|VC|VD|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|GC|GC|__|__|VC|VC|VC|VC|VC|VD|DV|__|GC|GC|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|GC|GC|__|AV|VD|VC|VC|VC|VC|VC|__|__|GC|GC|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|VC|VC|VD|VC|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|SV|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|WC|__|__|__|__|__|__|__|__|__|__|__|__|__|__|WP|__|__|__|__|__|\n" +
-            "|__|__|CC|CD|CC|CC|CC|__|__|__|__|GC|GC|__|__|__|__|PP|PD|PP|PP|PP|__|__|\n" +
-            "|__|__|CC|CC|CC|CC|CD|DC|__|__|__|GC|GC|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
-            "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
-            "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|AP|PD|PP|PP|PP|PP|__|__|\n" +
-            "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n";
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HD|DH|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HH|__|__|__|__|GC|GC|__|__|__|AM|MD|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HD|HH|__|__|__|__|GC|GC|__|__|__|__|MM|MM|MM|MD|MM|__|__|\n" +
+                    "|__|__|__|__|__|SH|__|__|__|__|__|__|__|__|__|__|__|__|__|__|SM|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|WV|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|VC|VC|VC|VD|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|GC|GC|__|__|VC|VC|VC|VC|VC|VD|DV|__|GC|GC|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|GC|GC|__|AV|VD|VC|VC|VC|VC|VC|__|__|GC|GC|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|VC|VC|VD|VC|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|SV|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|WC|__|__|__|__|__|__|__|__|__|__|__|__|__|__|WP|__|__|__|__|__|\n" +
+                    "|__|__|CC|CD|CC|CC|CC|__|__|__|__|GC|GC|__|__|__|__|PP|PD|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CD|DC|__|__|__|GC|GC|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|AP|PD|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n";
     // @formatter:on
 
 
-    public Board(int width, int height){
+    public Board(int width, int height) {
         cells = new Cell[width][height];
         //Add all the estates to this board with lists of indexes to free storage cells
 
@@ -65,35 +66,42 @@ public class Board extends JPanel {
             estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
             estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
             estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 9, 10, ImageIO.read(new File("src/resources/long_estate.png"))));
-        }catch(IOException e){
+        } catch (IOException e) {
             System.out.println("Image cannot be found");
         }
     }
 
 
-
     /**
      * Redraw the estates to update objects inside
      */
-    public void redrawEstates(){
-        for(Map.Entry<String, Estate> mp : estates.entrySet()){
-            mp.getValue().redrawEstate(this);
-        }
+//    public void redrawEstates() {
+//        for (Map.Entry<String, Estate> mp : estates.entrySet()) {
+//            mp.getValue().redrawEstate(this);
+//        }
+//    }
+
+    public void addWeapons(ArrayList<Weapon> wp) {
+        this.weapons = wp;
     }
 
-    public void addPlayer(Player p){
+    public List<Weapon> getWeapons() {
+        return this.weapons;
+    }
+
+    public void addPlayer(Player p) {
         this.players.add(p);
     }
 
     @Override
-    public void paint(Graphics g){
+    public void paint(Graphics g) {
 
         //paint the cells on the board
         int xStep = 0;
         int yStep = 0;
 
-        for(Cell[] c1 : cells){
-            for(Cell c2 : c1){
+        for (Cell[] c1 : cells) {
+            for (Cell c2 : c1) {
                 g.drawImage(c2.getCellImage(), xStep, yStep, SIZE, SIZE, null);
                 xStep += SIZE;
             }
@@ -102,21 +110,23 @@ public class Board extends JPanel {
         }
 
         //paint the estates on the board
-        for(Map.Entry<String, Estate> es : estates.entrySet()){
+        for (Map.Entry<String, Estate> es : estates.entrySet()) {
             Image img = es.getValue().getEstateImg();
-            int imgSize = img.getWidth(null) / 2;
-            g.drawImage(img, es.getValue().getRow() * SIZE, es.getValue().getCol() * SIZE, img.getWidth(null) / 2 , img.getHeight(null) / 2, null);
+            g.drawImage(img, es.getValue().getRow() * SIZE, es.getValue().getCol() * SIZE, img.getWidth(null) / 2, img.getHeight(null) / 2, null);
+            es.getValue().redrawEstate(this, g);
         }
 
+
+
         //paint the players on the board
-        for(Player p : players){
+        for (Player p : players) {
             System.out.println(p);
             g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
         }
     }
 
-    public void loadCellImages(){
-        try{
+    public void loadCellImages() {
+        try {
             cellImages.put("__", ImageIO.read(new File("src/resources/free_cell.png")));
             cellImages.put("GC", ImageIO.read(new File("src/resources/grey_cell.png")));
             cellImages.put("Bert", ImageIO.read(new File("src/resources/player_be.png")));
@@ -124,7 +134,7 @@ public class Board extends JPanel {
             cellImages.put("Percy", ImageIO.read(new File("src/resources/player_pe.png")));
             cellImages.put("Malina", ImageIO.read(new File("src/resources/player_ma.png")));
 
-        }catch (IOException e){
+        } catch (IOException e) {
             System.out.println("Invalid cell image");
         }
 
@@ -134,7 +144,7 @@ public class Board extends JPanel {
     /**
      * This method sets up the board before the game starts
      */
-    public void setup(){
+    public void setup() {
         loadCellImages();
         Scanner sc = new Scanner(boardCells).useDelimiter("\\|");
 
@@ -142,9 +152,9 @@ public class Board extends JPanel {
         int col = 0;
 
         //The switch checks for the cell type and add it to the 2d array that makes up the baord
-        while(sc.hasNext()){
+        while (sc.hasNext()) {
             String next = sc.next();
-            switch(next) {
+            switch (next) {
                 case "__":
                     cells[row][col++] = new FreeCell(row, col, cellImages.get("__"));
                     break;
@@ -152,61 +162,61 @@ public class Board extends JPanel {
                     cells[row][col++] = new GreyCell(row, col, cellImages.get("GC"));
                     break;
                 case "CC":
-                    EstateCell cc = new EstateCell(row, col,"Calamity", "Castle", false, cellImages.get("__"));
+                    EstateCell cc = new EstateCell(row, col, "Calamity", "Castle", false, cellImages.get("__"));
 
                     cells[row][col++] = cc;
                     estates.get("Calamity Door").addCell(cc);
                     break;
                 case "CD":
-                    EstateCell cd = new EstateCell(row, col,"Calamity", "Door", true, cellImages.get("__"));
+                    EstateCell cd = new EstateCell(row, col, "Calamity", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = cd;
                     estates.get("Calamity Door").addCell(cd);
                     break;
                 case "PP":
-                    EstateCell pp = new EstateCell(row, col,"Peril", "Palace", false, cellImages.get("__"));
+                    EstateCell pp = new EstateCell(row, col, "Peril", "Palace", false, cellImages.get("__"));
 
                     cells[row][col++] = pp;
                     estates.get("Peril Door").addCell(pp);
                     break;
                 case "PD":
-                    EstateCell pd = new EstateCell(row, col,"Peril", "Door", true, cellImages.get("__"));
+                    EstateCell pd = new EstateCell(row, col, "Peril", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = pd;
                     estates.get("Peril Door").addCell(pd);
                     break;
                 case "MM":
-                    EstateCell mm = new EstateCell(row, col,"Manic", "Manor", false, cellImages.get("__"));
+                    EstateCell mm = new EstateCell(row, col, "Manic", "Manor", false, cellImages.get("__"));
 
                     cells[row][col++] = mm;
                     estates.get("Manic Door").addCell(mm);
                     break;
                 case "MD":
-                    EstateCell md = new EstateCell(row, col,"Manic", "Door", true, cellImages.get("__"));
+                    EstateCell md = new EstateCell(row, col, "Manic", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = md;
                     estates.get("Manic Door").addCell(md);
                     break;
                 case "HH":
-                    EstateCell hh = new EstateCell(row, col,"Haunted", "House", false, cellImages.get("__"));
+                    EstateCell hh = new EstateCell(row, col, "Haunted", "House", false, cellImages.get("__"));
 
                     cells[row][col++] = hh;
                     estates.get("Haunted Door").addCell(hh);
                     break;
                 case "HD":
-                    EstateCell hd = new EstateCell(row, col,"Haunted", "Door", true, cellImages.get("__"));
+                    EstateCell hd = new EstateCell(row, col, "Haunted", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = hd;
                     estates.get("Haunted Door").addCell(hd);
                     break;
                 case "VC":
-                    EstateCell vc = new EstateCell(row, col,"Villa", "Celia", false, cellImages.get("__"));
+                    EstateCell vc = new EstateCell(row, col, "Villa", "Celia", false, cellImages.get("__"));
 
                     cells[row][col++] = vc;
                     estates.get("Villa Door").addCell(vc);
                     break;
                 case "VD":
-                    EstateCell vd = new EstateCell(row, col,"Villa", "Door", true, cellImages.get("__"));
+                    EstateCell vd = new EstateCell(row, col, "Villa", "Door", true, cellImages.get("__"));
 
                     cells[row][col++] = vd;
                     estates.get("Villa Door").addCell(vd);
@@ -214,7 +224,7 @@ public class Board extends JPanel {
                 default:
 
                     //If the cell is an exit door cell this method add it to the correct estate as well as the exit direction
-                    if(EXITCELLPATTERN.matcher(next).find()){
+                    if (EXITCELLPATTERN.matcher(next).find()) {
                         Cell exitCell = new FreeCell(row, col, cellImages.get("__"));
                         cells[row][col++] = exitCell;
 
@@ -250,15 +260,16 @@ public class Board extends JPanel {
 
     /**
      * Redraw a single cell at a given position
+     *
      * @param row the row to be redrawn
      * @param col the col to be redrawn
-     * @param c the cell to to be drawn in that destination
+     * @param c   the cell to to be drawn in that destination
      */
-    public void redrawCell(int row, int col, Cell c){
+    public void redrawCell(int row, int col, Cell c) {
         cells[row][col] = c;
     }
 
-    public Map<String, Image> getCellImages(){
+    public Map<String, Image> getCellImages() {
         return cellImages;
     }
 
@@ -266,28 +277,28 @@ public class Board extends JPanel {
      * Getters and setters
      */
 
-    public Cell[][] getCells(){
+    public Cell[][] getCells() {
         return cells;
     }
 
-    public void setCells(Cell[][] cells){
+    public void setCells(Cell[][] cells) {
         this.cells = cells;
     }
 
-    public void setPlayer(Player p){
+    public void setPlayer(Player p) {
         cells[p.getRow()][p.getCol()] = new PlayerCell(p.getRow(), p.getCol(), p.getName(), cellImages.get("__"));
     }
 
 
-    public Estate getEstate(String name){
+    public Estate getEstate(String name) {
         return estates.get(name);
     }
 
-    public Cell getCell(int row, int col){
+    public Cell getCell(int row, int col) {
         return cells[row][col];
     }
 
-    public Map<String, Estate> getEstates(){
+    public Map<String, Estate> getEstates() {
         return estates;
     }
 
@@ -295,14 +306,15 @@ public class Board extends JPanel {
     /**
      * This toString is for drawing the board onto the text pane for the user
      * It simply iterates the 2d array and uses each objects toString to draw the correct cell visualizations
+     *
      * @return The board as a big string
      */
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        for(Cell[] c1 : cells) {
+        for (Cell[] c1 : cells) {
 
-            for(Cell c2 : c1){
+            for (Cell c2 : c1) {
                 sb.append("|");
                 sb.append(c2.toString());
             }

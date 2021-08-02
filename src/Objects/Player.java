@@ -137,7 +137,7 @@ public class Player extends Move implements Cloneable {
                     break;
             }
 
-            b.redrawEstates();
+            b.repaint();
         }else if (this.getEstateIn() != null) {
             isValidEstate(b,direction);
 
@@ -165,7 +165,7 @@ public class Player extends Move implements Cloneable {
                 if (checkVisited(c[newPos.getRow()][newPos.getCol()])) {
                     estateIn.removePlayersInEstate(this);
                     c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name, b.getCellImages().get("__"));
-                    b.redrawEstates();
+                    b.repaint();
                     this.row = newPos.getRow();
                     this.col = newPos.getCol();
                     steps--;

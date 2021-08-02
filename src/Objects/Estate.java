@@ -52,7 +52,9 @@ public class Estate {
      *
      * @param b the board to redraw on
      */
-    public void redrawEstate(Board b) {
+    public void redrawEstate(Board b, Graphics g) {
+
+        int SIZE = 24;
 
 
         for (Cell c : estateCellList) {
@@ -61,7 +63,13 @@ public class Estate {
 
         //Special method for picking the right location to redraw the players in the estate
         for(int i = 0; i < playersInEstate.size() + weaponsInEstate.size(); i++){
-            b.redrawCell(estateCellList.get(availableCells.get(i)).getRow(), estateCellList.get(availableCells.get(i)).getCol(), cellObjectsInEstate.get(i));
+
+            int row = estateCellList.get(availableCells.get(i)).getRow();
+            int col = estateCellList.get(availableCells.get(i)).getCol();
+
+            g.drawImage(cellObjectsInEstate.get(i).getCellImage(), row * SIZE, col * SIZE, SIZE, SIZE, null);
+
+            b.redrawCell(row, col, cellObjectsInEstate.get(i));
         }
 
         b.repaint();
@@ -110,7 +118,7 @@ public class Estate {
 
     public void addWeaponInEstate(Weapon wp){
         this.weaponsInEstate.add(wp);
-        this.cellObjectsInEstate.add(new WeaponCell(0, 0, wp.getWepName(), null ));
+        this.cellObjectsInEstate.add(new WeaponCell(0, 0, wp.getWepName(), wp.getImg()));
         wp.setEstate(this);
 
     }
