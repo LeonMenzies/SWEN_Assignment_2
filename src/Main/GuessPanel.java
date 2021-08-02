@@ -38,7 +38,7 @@ public class GuessPanel extends JPanel implements ActionListener {
                 count++;
             }
         }
-        return count == 3;
+        return count == 3 || count == 0;
     }
 
     public ArrayList<Card> selectedCards(){
