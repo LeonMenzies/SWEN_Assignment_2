@@ -1,4 +1,4 @@
-package Main;
+package Gui;
 
 import Cards.Card;
 
@@ -38,7 +38,7 @@ public class GuessPanel extends JPanel implements ActionListener {
                 count++;
             }
         }
-        return count == 3 || count == 0;
+        return count == 3;
     }
 
     public ArrayList<Card> selectedCards(){

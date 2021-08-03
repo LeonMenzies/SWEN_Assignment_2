@@ -2,6 +2,9 @@ package Main;
 
 import Cells.*;
 import Cards.*;
+import Gui.GuessPanel;
+import Gui.JTextFieldChecker;
+import Gui.RefutePanel;
 import Objects.*;
 
 import javax.imageio.ImageIO;
@@ -180,7 +183,7 @@ public class Game implements WindowListener {
                 makeGuess(p);
                 refuteCards.clear();
 
-                refute(p.getGuess());
+          //      refute(p.getGuess());
 
                 System.out.println("Please past the tablet back to " + p.getName());
                 input.next();
@@ -248,68 +251,68 @@ public class Game implements WindowListener {
         return count == 3;
     }
 
-    /**
-     * Goes through all the players aside from the guesser and checks if they can refute
-     *
-     * @param guess list of the current guess
-     */
-    public void refute(List<Card> guess) {
-        //goes through the list of players in the correct refute order displaying the current guess cards
-        for (int i = 0; i < tempPlayers.size(); i++) {
-            while (true) {
-                System.out.println("The current Guess is:");
-                for (Card c : guess) {
-                    System.out.print(c.getName() + " ");
-                }
-                System.out.println();
-                //prints out who's turn it is to refute and there cards
-                Scanner input = new Scanner(System.in);
-                System.out.println("It is " + tempPlayers.get(i).getName() + "'s time to make a refute ");
-                tempPlayers.get(i).printHand();
-                System.out.println("Please pick a card that refutes eg 1 or enter 4 if you cant refute");
-                String in = input.next();
-                //method checks to see if they have entered a number
-                if (isNumeric(in)) {
-                    int j = Integer.parseInt(in.substring(0, 1));
-                    if (j > tempPlayers.get(i).getHand().size() - 1 && j != 4) {
-                        System.out.println("Please enter a valid number");
-
-                    }
-                    //following ifs check if they can refute or if the refute is legit
-                    else if (j == 4) {
-                        boolean check = checkRefute(guess, tempPlayers.get(i).getHand());
-                        if (check) {
-                            System.out.println("You can refute please try again");
-
-                        } else {
-                            break;
-                        }
-                    } else {
-                        //pulls the card and checks it is a refute
-                        Card r = tempPlayers.get(i).getHand().get(j);
-                        boolean isRefute = isARefute(guess, r);
-                        //if refute is legit card is added to one to show player making the guess
-                        if (isRefute) {
-                            //player is removed from the list and the next player goes
-                            Player temp = players.get(i);
-                            tempPlayers.remove(temp);
-                            refuteCards.add(r);
-                            break;
-                        } else {
-                            System.out.println("This refute is incorrect try again or select can't refute");
-
-                        }
-                    }
-
-
-                }
-
-
-            }
-
-        }
-
-    }
+//    /**
+//     * Goes through all the players aside from the guesser and checks if they can refute
+//     *
+//     * @param guess list of the current guess
+//     */
+//    public void refute(List<Card> guess) {
+//        //goes through the list of players in the correct refute order displaying the current guess cards
+//        for (int i = 0; i < tempPlayers.size(); i++) {
+//            while (true) {
+//                System.out.println("The current Guess is:");
+//                for (Card c : guess) {
+//                    System.out.print(c.getName() + " ");
+//                }
+//                System.out.println();
+//                //prints out who's turn it is to refute and there cards
+//                Scanner input = new Scanner(System.in);
+//                System.out.println("It is " + tempPlayers.get(i).getName() + "'s time to make a refute ");
+//                tempPlayers.get(i).printHand();
+//                System.out.println("Please pick a card that refutes eg 1 or enter 4 if you cant refute");
+//                String in = input.next();
+//                //method checks to see if they have entered a number
+//                if (isNumeric(in)) {
+//                    int j = Integer.parseInt(in.substring(0, 1));
+//                    if (j > tempPlayers.get(i).getHand().size() - 1 && j != 4) {
+//                        System.out.println("Please enter a valid number");
+//
+//                    }
+//                    //following ifs check if they can refute or if the refute is legit
+//                    else if (j == 4) {
+//                        boolean check = checkRefute(guess, tempPlayers.get(i).getHand());
+//                        if (check) {
+//                            System.out.println("You can refute please try again");
+//
+//                        } else {
+//                            break;
+//                        }
+//                    } else {
+//                        //pulls the card and checks it is a refute
+//                        Card r = tempPlayers.get(i).getHand().get(j);
+//                        boolean isRefute = isARefute(guess, r);
+//                        //if refute is legit card is added to one to show player making the guess
+//                        if (isRefute) {
+//                            //player is removed from the list and the next player goes
+//                            Player temp = players.get(i);
+//                            tempPlayers.remove(temp);
+//                            refuteCards.add(r);
+//                            break;
+//                        } else {
+//                            System.out.println("This refute is incorrect try again or select can't refute");
+//
+//                        }
+//                    }
+//
+//
+//                }
+//
+//
+//            }
+//
+//        }
+//
+//    }
 
     /**
      * Checks to see if the card refute is a legit refute
@@ -851,9 +854,20 @@ public class Game implements WindowListener {
                     guessDeck = jpane.selectedCards();
                     break;
                 }
+            }else if(result == JOptionPane.CANCEL_OPTION){
+                break;
             }
         }
 
+    refute(guessDeck);
+
+    }
+
+    public void refute(List<Card> guess){
+        RefutePanel rP = new RefutePanel(guess);
+        int result = JOptionPane.showConfirmDialog(null, rP,
+                "Its "+ "names " + "to refute", JOptionPane.OK_CANCEL_OPTION,
+                JOptionPane.PLAIN_MESSAGE);
     }
 
     @Override
