@@ -24,6 +24,10 @@ public class RefutePanel extends JPanel implements ActionListener {
             button.addActionListener(this);
             buttons.add(button);
         }
+        JRadioButton cant = new JRadioButton("Can't Refute");
+        cant.setActionCommand("select");
+        cant.addActionListener(this);
+        buttons.add(cant);
         ButtonGroup bG = new ButtonGroup();
         JPanel radioPanel = new JPanel(new GridLayout(0, 1));
         for (JRadioButton jB : buttons) {
@@ -41,7 +45,7 @@ public class RefutePanel extends JPanel implements ActionListener {
     public Card cardSelected(){
         Card toReturn = null;
 
-        for(int i = 0; i < buttons.size(); i++){
+        for(int i = 0; i < buttons.size()-1; i++){
             if(buttons.get(i).isSelected()){
                 toReturn = buttonNames.get(i);
             }

@@ -22,7 +22,7 @@ public class Player extends Move implements Cloneable {
     private Random dice1 = new Random();
     private Random dice2 = new Random();
     private final int UPPERBOUND = 6;
-    private int steps = 100;
+    private int steps;
     private boolean rollStatus = false;
     private boolean isOut = false;
     private boolean hasWon = false;
