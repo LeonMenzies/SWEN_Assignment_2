@@ -2,9 +2,7 @@ package Main;
 
 import Cells.*;
 import Cards.*;
-import Gui.GuessPanel;
-import Gui.JTextFieldChecker;
-import Gui.RefutePanel;
+import Gui.*;
 import Objects.*;
 
 import javax.imageio.ImageIO;
@@ -19,7 +17,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Game implements WindowListener {
+public class Game extends Subject implements WindowListener {
     ArrayList<Player> players = new ArrayList<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
     ArrayList<Card> deck = new ArrayList<>();
@@ -42,11 +40,13 @@ public class Game implements WindowListener {
 
 
     private static Board board;
+    private static BoardCanvas boardCanvas;
     private JFrame frame;
     private static Game game;
 
 
     public Game() {
+        super.addObserver(boardCanvas);
     }
 
     public static void main(String[] args) {
@@ -54,6 +54,7 @@ public class Game implements WindowListener {
 
         board = new Board(24, 24);
         board.setup();
+        boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getEstates(), board.getPlayers());
         game = new Game();
         game.setUpDeck();
         game.setupGui();
@@ -163,6 +164,7 @@ public class Game implements WindowListener {
             boolean matchFound = matcher.matches();
             if (matchFound && p.getSteps() != 0) {
                 p.move(board, in);
+                this.notifyObservers();
 
             } else if (matchFound && p.getSteps() == 0) {
                 System.out.println("You are out of steps or please roll");
@@ -500,7 +502,7 @@ public class Game implements WindowListener {
             }
         }
 
-        board.repaint();
+        boardCanvas.repaint();
 
     }
 
@@ -615,7 +617,7 @@ public class Game implements WindowListener {
         for (Player p : players) {
             board.addPlayer(p);
         }
-        board.repaint();
+        boardCanvas.repaint();
 
     }
 
@@ -747,11 +749,11 @@ public class Game implements WindowListener {
         frame.setMaximumSize(new Dimension(1000, 1000));
         frame.setLayout(new BorderLayout());
 
-        board.setSize(720, 720);
-        frame.add(board, BorderLayout.CENTER);
-        board.repaint();
+        boardCanvas.setSize(720, 720);
+        frame.add(boardCanvas, BorderLayout.CENTER);
+        boardCanvas.repaint();
 
-        board.addMouseListener(new MouseAdapter() {
+        boardCanvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
@@ -775,14 +777,13 @@ public class Game implements WindowListener {
         JButton roll = new JButton("Roll");
 
         roll.addActionListener(ev -> {
-            board.repaint();
+
         });
 
         JButton showHand = new JButton("Show Hand");
         JButton guess = new JButton("Make Guess");
         JButton finalGuess = new JButton("Make Final Guess");
         JButton endTurn = new JButton("End Turn");
-
 
         buttons.add(roll);
         buttons.add(showHand);

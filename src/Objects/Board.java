@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
 /***
  * The board class holds all the information about the board including its initial state as well as methods to alter its state
  */
-public class Board extends JPanel {
+public class Board {
 
     Map<String, Estate> estates = new HashMap<>();
     Map<String, Image> cellImages = new HashMap<>();
@@ -89,40 +89,12 @@ public class Board extends JPanel {
         return this.weapons;
     }
 
-    public void addPlayer(Player p) {
-        this.players.add(p);
+    public List<Player> getPlayers(){
+        return this.players;
     }
 
-    @Override
-    public void paint(Graphics g) {
-
-        //paint the cells on the board
-        int xStep = 0;
-        int yStep = 0;
-
-        for (Cell[] c1 : cells) {
-            for (Cell c2 : c1) {
-                g.drawImage(c2.getCellImage(), xStep, yStep, SIZE, SIZE, null);
-                xStep += SIZE;
-            }
-            xStep = 0;
-            yStep += SIZE;
-        }
-
-        //paint the estates on the board
-        for (Map.Entry<String, Estate> es : estates.entrySet()) {
-            Image img = es.getValue().getEstateImg();
-            g.drawImage(img, es.getValue().getRow() * SIZE, es.getValue().getCol() * SIZE, img.getWidth(null) / 2, img.getHeight(null) / 2, null);
-            es.getValue().redrawEstate(this, g);
-        }
-
-
-
-        //paint the players on the board
-        for (Player p : players) {
-         //   System.out.println(p);
-            g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
-        }
+    public void addPlayer(Player p) {
+        this.players.add(p);
     }
 
     public void loadCellImages() {

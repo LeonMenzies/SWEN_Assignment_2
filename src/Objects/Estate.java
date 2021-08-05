@@ -4,6 +4,7 @@ import Cells.Cell;
 import Cells.EstateCell;
 import Cells.PlayerCell;
 import Cells.WeaponCell;
+import Gui.BoardCanvas;
 
 import java.awt.*;
 import java.util.*;
@@ -71,8 +72,6 @@ public class Estate {
 
             b.redrawCell(row, col, cellObjectsInEstate.get(i));
         }
-
-        b.repaint();
     }
 
 

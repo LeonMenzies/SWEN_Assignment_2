@@ -2,6 +2,7 @@ package Objects;
 
 import Cards.*;
 import Cells.*;
+import Gui.BoardCanvas;
 
 import java.awt.*;
 import java.util.*;
@@ -21,7 +22,7 @@ public class Player extends Move implements Cloneable {
     private Random dice1 = new Random();
     private Random dice2 = new Random();
     private final int UPPERBOUND = 6;
-    private int steps = 0;
+    private int steps = 100;
     private boolean rollStatus = false;
     private boolean isOut = false;
     private boolean hasWon = false;
@@ -136,10 +137,8 @@ public class Player extends Move implements Cloneable {
                 default:
                     break;
             }
-
-            b.repaint();
         }else if (this.getEstateIn() != null) {
-            isValidEstate(b,direction);
+            isValidEstate(b, direction);
 
         } else {
             System.out.println("Objects.Move is not valid");
@@ -165,7 +164,6 @@ public class Player extends Move implements Cloneable {
                 if (checkVisited(c[newPos.getRow()][newPos.getCol()])) {
                     estateIn.removePlayersInEstate(this);
                     c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name, b.getCellImages().get("__"));
-                    b.repaint();
                     this.row = newPos.getRow();
                     this.col = newPos.getCol();
                     steps--;
