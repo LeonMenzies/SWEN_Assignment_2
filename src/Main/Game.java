@@ -10,6 +10,8 @@ import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.event.MenuKeyEvent;
 import javax.swing.event.MenuKeyListener;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.text.DefaultCaret;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
@@ -34,10 +36,12 @@ public class Game extends Subject implements WindowListener {
     JButton guess;
     JButton endTurn;
     JButton roll;
+    JTextArea textDisplay;
+    JTextArea textArea;
     Player winner = null;
     Player currentPlayer = null;
-    Pattern MovePat = Pattern.compile("[RGHFWASDE]");
-    Pattern dirPat = Pattern.compile("[WASD]");
+    //Pattern MovePat = Pattern.compile("[RGHFWASDE]");
+    //Pattern dirPat = Pattern.compile("[WASD]");
 
     private String[] names;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
@@ -60,7 +64,7 @@ public class Game extends Subject implements WindowListener {
 
         board = new Board(24, 24);
         board.setup();
-        boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getEstates(), board.getPlayers());
+        boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
         game = new Game();
 
         game.setupGui();
@@ -121,16 +125,16 @@ public class Game extends Subject implements WindowListener {
 
             }
             //if input matches a move direction moves the player and updates there steps unless they are out of steps
-            Matcher matcher = dirPat.matcher(in);
-            boolean matchFound = matcher.matches();
-            if (matchFound && p.getSteps() != 0) {
-                p.move(board, in);
-                this.notifyObservers();
-
-            } else if (matchFound && p.getSteps() == 0) {
-                System.out.println("You are out of steps or please roll");
-
-            }
+//            Matcher matcher = dirPat.matcher(in);
+//            boolean matchFound = matcher.matches();
+//            if (matchFound && p.getSteps() != 0) {
+//                p.move(board, in);
+//                this.notifyObservers();
+//
+//            } else if (matchFound && p.getSteps() == 0) {
+//                System.out.println("You are out of steps or please roll");
+//
+//            }
 
             if (in.equals("H")) {
                 p.printHand();
@@ -222,8 +226,12 @@ public class Game extends Subject implements WindowListener {
                     for (Player p : players) {
                         if (!p.getIsOut()) {
                             JOptionPane.showMessageDialog(frame, "It is " + p.getName() + " turn please past the tablet to them");
+
                             currentPlayer = p;
+
                             p.setTurn(true);
+                            notifyObservers();
+
                             playersturn(p);
                         }
                     }
@@ -710,7 +718,7 @@ public class Game extends Subject implements WindowListener {
 
     public void startgame() {
         setUpDeck();
-        weaponSetup();
+
         generateMurder();
         dealCards();
 
@@ -719,6 +727,7 @@ public class Game extends Subject implements WindowListener {
         Player p = players.get(i);
         //then generates the starting order based on who starts first
         generateStartingOrder(p);
+
         this.isRunning = true;
         this.gameLoop.start();
     }
@@ -845,15 +854,16 @@ public class Game extends Subject implements WindowListener {
 
 
     public void setupGui() {
+
+
+
         frame = new JFrame("Murder Madness");
-        frame.setSize(720, 720);
-        frame.setMinimumSize(new Dimension(700, 700));
-        frame.setMaximumSize(new Dimension(1000, 1000));
+        frame.setSize(576, 720);
+        frame.setResizable(false);
         frame.setLayout(new BorderLayout());
 
-        boardCanvas.setSize(720, 720);
+        boardCanvas.setSize(576, 576);
         frame.add(boardCanvas, BorderLayout.CENTER);
-        boardCanvas.repaint();
 
         boardCanvas.addMouseListener(new MouseAdapter() {
             @Override
@@ -866,20 +876,30 @@ public class Game extends Subject implements WindowListener {
 
                 if (xClick >= 0 && xClick <= 24 && yClick >= 0 && yClick <= 24) {
 
-                    System.out.println(board.getCell(xClick, yClick));
+                    if(currentPlayer.move(board, xClick, yClick)){
+                        notifyObservers();
+                    } else {
+                        UIPrint("Invalid Move");
+                    }
+
+
                 }
             }
         });
 
+
+
         this.setUpGameLoop();
+        //Panel to hold the buttons and the text panel
+        JPanel controls = new JPanel();
+
+        controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
+
+        //panel to hold the buttons down the bottom
         JPanel buttons = new JPanel();
         buttons.setLayout(new FlowLayout());
-        frame.add(buttons, BorderLayout.PAGE_END);
 
         roll = new JButton("Roll");
-
-
-
         JButton showHand = new JButton("Show Hand");
         guess = new JButton("Make Guess");
         JButton finalGuess = new JButton("Make Final Guess");
@@ -891,14 +911,51 @@ public class Game extends Subject implements WindowListener {
         buttons.add(finalGuess);
         buttons.add(endTurn);
 
+        //Text area for information
+        textDisplay = new JTextArea();
+        textDisplay.setEditable(false);
+        DefaultCaret caret = (DefaultCaret)textDisplay.getCaret();
+        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+
+
+        controls.add(textDisplay);
+        controls.add(buttons);
+
+        frame.add(controls, BorderLayout.PAGE_END);
+
 
         addMenu();
 
         //Create the text field
         frame.addWindowListener(this);
-
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        try {
+            UIManager.setLookAndFeel(new NimbusLookAndFeel());
+            UIManager.put("control", new Color(58,58,59));
+            UIManager.put("info", new Color(58,58,59));
+            UIManager.put("nimbusBase", new Color(28, 28, 30));
+            UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
+            UIManager.put("nimbusDisabledText", new Color(58,58,59));
+            UIManager.put("nimbusFocus", new Color(115, 164, 209));
+            UIManager.put("nimbusGreen", new Color(176, 179, 50));
+            UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
+            UIManager.put("nimbusLightBackground", new Color(18, 30, 49));
+            UIManager.put("nimbusOrange", new Color(191, 98, 4));
+            UIManager.put("nimbusRed", new Color(169, 46, 34));
+            UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
+            UIManager.put("nimbusSelectionBackground", new Color(72,72,74));
+            UIManager.put("text", new Color(230, 230, 230));
+            SwingUtilities.updateComponentTreeUI(frame);
+        } catch (UnsupportedLookAndFeelException exc) {
+            System.err.println("Nimbus: Unsupported Look and feel!");
+        }
+
         frame.setVisible(true);
+    }
+
+    public void UIPrint(String s){
+        textDisplay.setText("Steps: " + currentPlayer.getSteps() + " | " + s + "\n");
     }
 
     public void addMenu() {
@@ -941,6 +998,7 @@ public class Game extends Subject implements WindowListener {
         }
 
         game.playerSetUp(names.length);
+        game.weaponSetup();
 
 
         JPanel dialogPanel = new JPanel(new GridBagLayout());
@@ -953,10 +1011,16 @@ public class Game extends Subject implements WindowListener {
         JTextField player2Name = new JTextField(5);
         JTextField player3Name = new JTextField(5);
 
+        player1Name.setText("Harry");
+        player2Name.setText("Leon");
+        player3Name.setText("Terry");
+
+
         JTextFieldChecker JC = new JTextFieldChecker();
         JC.addTextField(player1Name);
         JC.addTextField(player2Name);
         JC.addTextField(player3Name);
+
 
 
         dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));

@@ -23,7 +23,6 @@ public class Board {
     ArrayList<Weapon> weapons = new ArrayList<>();
     List<Player> players = new ArrayList<>();
     Cell[][] cells;
-    public final int SIZE = 24;
     public final Pattern EXITCELLPATTERN = Pattern.compile("WV|AV|SV|DV|DH|SH|AM|SM|WP|AP|WC|DC");
 
     // @formatter:off
@@ -61,11 +60,11 @@ public class Board {
 
         try {
 
-            estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/normal_estate.png"))));
-            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/normal_estate.png"))));
-            estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
-            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/normal_estate.png"))));
-            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 9, 10, ImageIO.read(new File("src/resources/long_estate.png"))));
+            estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/estate_haunted_house.png"))));
+            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
+            estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/estate_peril_palace.png"))));
+            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/estate_calamity_castle.png"))));
+            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 9, 10, ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
         } catch (IOException e) {
             System.out.println("Image cannot be found");
         }
@@ -295,4 +294,5 @@ public class Board {
         }
         return sb.toString();
     }
+
 }

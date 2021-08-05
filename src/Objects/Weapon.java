@@ -7,7 +7,7 @@ import java.awt.*;
 /***
  * A weapon object represents a weapon that is part of the game and can be used in guess of the murder
  */
-public class Weapon {
+public class Weapon implements Movable{
     String wepName;
 
     int row;
@@ -64,6 +64,17 @@ public class Weapon {
     public void setCol(int c){
         this.col = c;
     }
+
+    public Image getCellImage(){
+        return this.weaponImg;
+    }
+
+    @Override
+    public void setCoord(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
     /**
      * The string representation of this weapon object
      * @return The first two letters of weapons name

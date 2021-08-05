@@ -13,7 +13,7 @@ import java.util.Random;
  * The player class holds all the information about the player and its status in the game. The object also has all the methods for
  * moving the player around the board, as well as going in and out of estate objects
  */
-public class Player extends Move implements Cloneable {
+public class Player extends Move implements Cloneable, Movable {
     private boolean turn = false;
     private Estate estateIn = null;
     private String name;
@@ -22,11 +22,12 @@ public class Player extends Move implements Cloneable {
     private Random dice1 = new Random();
     private Random dice2 = new Random();
     private final int UPPERBOUND = 6;
-    private int steps;
+    private int steps = 0;
     private boolean rollStatus = false;
     private boolean isOut = false;
     private boolean hasWon = false;
     private boolean hasGuessed = false;
+
     private Image cellImage;
 
     private ArrayList<Card> guesses;
@@ -92,13 +93,36 @@ public class Player extends Move implements Cloneable {
         return p;
     }
 
+    public void deSelect(){
+
+    }
+
     /**
      * after checking the move is valid move the player on the given board
      *
      * @param b         the current board
-     * @param direction the direction the player is moving
      */
-    public void move(Board b, String direction) {
+    public boolean move(Board b, int xClick, int yClick) {
+
+        String direction;
+
+        int xDif = col - xClick;
+        int yDif = row -yClick;
+
+
+        if (xDif == 1 && yDif == 0){
+            direction = "A";
+        } else if (xDif == -1 && yDif == 0){
+            direction = "D";
+        } else if(yDif == -1 && xDif == 0){
+            direction = "S";
+        } else if(yDif == 1 && xDif == 0){
+            direction = "W";
+        } else {
+            return false;
+        }
+
+
         if (isValid(b, direction)) {
 
 
@@ -141,8 +165,9 @@ public class Player extends Move implements Cloneable {
             isValidEstate(b, direction);
 
         } else {
-            System.out.println("Objects.Move is not valid");
+           return false;
         }
+        return true;
     }
 
     /**
@@ -382,6 +407,12 @@ public class Player extends Move implements Cloneable {
         return estateIn.getEstateName();
     }
 
+    @Override
+    public void setCoord(int row, int col) {
+        this.row = row;
+        this.col = col;
+    }
+
     /**
      * toString method for getting the player initial two letters of there name
      *
@@ -392,5 +423,6 @@ public class Player extends Move implements Cloneable {
 
         return name.substring(0, 2);
     }
+
 
 }
