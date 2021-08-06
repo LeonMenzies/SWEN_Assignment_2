@@ -697,13 +697,13 @@ public class Game extends Subject implements WindowListener {
 
 
         //players are then added to the array depending on the amount
-        players.add(new Player("Lucilla", 9, 1, board.getCellImages().get("Lucilla")));
-        players.add(new Player("Bert", 14, 22, board.getCellImages().get("Bert")));
-        players.add(new Player("Malina", 1, 11, board.getCellImages().get("Malina")));
+        players.add(new Player("Lucilla", 1, 11, board.getCellImages().get("Lucilla")));
+        players.add(new Player("Bert", 9, 1, board.getCellImages().get("Bert")));
+        players.add(new Player("Malina", 22, 9, board.getCellImages().get("Malina")));
 
         //4 player gets added in if necessary
         if (numPlayers == 4) {
-            players.add(new Player("Percy", 22, 9, board.getCellImages().get("Percy")));
+            players.add(new Player("Percy", 14, 22, board.getCellImages().get("Percy")));
         }
 
 
@@ -874,7 +874,7 @@ public class Game extends Subject implements WindowListener {
                 int yClick = Math.round(e.getY() / 24);
 
 
-                if (xClick >= 0 && xClick <= 24 && yClick >= 0 && yClick <= 24) {
+                if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
 
                     if(currentPlayer.move(board, xClick, yClick)){
                         notifyObservers();
