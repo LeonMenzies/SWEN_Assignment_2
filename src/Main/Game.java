@@ -612,12 +612,12 @@ public class Game extends Subject implements WindowListener {
                 } else {
                     for (int i = 0; i < board.getCells().length; i++) {
                         for (int j = 0; j < board.getCells().length; j++) {
-                            if (board.getCell(i, j) instanceof PlayerCell) {
-                                PlayerCell pc = (PlayerCell) board.getCell(i, j);
-                                if (pc.toString().equals(pl.toString())) {
-                                    board.redrawCell(i, j, new FreeCell(i, j, board.getCellImages().get("__")));
-                                }
-                            }
+//                            if (board.getCell(i, j) instanceof PlayerCell) {
+//                                PlayerCell pc = (PlayerCell) board.getCell(i, j);
+//                                if (pc.toString().equals(pl.toString())) {
+//                                    board.redrawCell(i, j, new FreeCell(i, j, board.getCellImages().get("__")));
+//                                }
+//                            }
                         }
                     }
                     e.addPlayersInEstate(pl);
@@ -625,9 +625,6 @@ public class Game extends Subject implements WindowListener {
 
             }
         }
-
-        boardCanvas.repaint();
-
     }
 
     /**
@@ -870,19 +867,18 @@ public class Game extends Subject implements WindowListener {
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
 
-                int xClick = Math.round(e.getX() / 24);
-                int yClick = Math.round(e.getY() / 24);
-
+                int xClick = (int)Math.floor(e.getX() / 24.0);
+                int yClick = (int)Math.floor(e.getY() / 24.0) ;
 
                 if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
 
-                    if(currentPlayer.move(board, xClick, yClick)){
+                    Cell selected = board.getCell(yClick, xClick);
+
+                    if(currentPlayer != null && currentPlayer.move(board, selected)){
                         notifyObservers();
                     } else {
                         UIPrint("Invalid Move");
                     }
-
-
                 }
             }
         });
@@ -955,7 +951,9 @@ public class Game extends Subject implements WindowListener {
     }
 
     public void UIPrint(String s){
-        textDisplay.setText("Steps: " + currentPlayer.getSteps() + " | " + s + "\n");
+        if(currentPlayer != null) {
+            textDisplay.setText("Steps: " + currentPlayer.getSteps() + " | " + s + "\n");
+        }
     }
 
     public void addMenu() {

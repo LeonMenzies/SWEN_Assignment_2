@@ -1,7 +1,5 @@
 package Objects;
 
-import Objects.Estate;
-
 import java.awt.*;
 
 /***
@@ -69,11 +67,6 @@ public class Weapon implements Movable{
         return this.weaponImg;
     }
 
-    @Override
-    public void setCoord(int row, int col) {
-        this.row = row;
-        this.col = col;
-    }
 
     /**
      * The string representation of this weapon object

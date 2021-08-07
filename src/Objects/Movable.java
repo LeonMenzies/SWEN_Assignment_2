@@ -1,6 +1,8 @@
 package Objects;
 
+import java.awt.*;
+
 public interface Movable {
 
-    public void setCoord(int row, int col);
+    Image getCellImage();
 }

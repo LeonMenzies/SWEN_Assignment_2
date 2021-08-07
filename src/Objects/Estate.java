@@ -2,10 +2,6 @@ package Objects;
 
 import Cells.Cell;
 import Cells.EstateCell;
-import Cells.PlayerCell;
-import Cells.WeaponCell;
-import Gui.BoardCanvas;
-
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -18,9 +14,9 @@ public class Estate {
     private List<Weapon> weaponsInEstate;
     private List<Player> playersInEstate;
     private List<Cell> estateCellList;
-    public List<Cell> cellObjectsInEstate;
+    private List<Movable> objectsInEstate;
     private List<Integer> availableCells;
-    private Map<String, Cell> exitCells;
+    private List<Cell> exitCells;
     private Image estateImg;
     private int row, col;
 
@@ -30,9 +26,9 @@ public class Estate {
         this.playersInEstate = new ArrayList<>();
         this.estateName = estateName;
         this.estateCellList = new ArrayList<>();
-        this.exitCells = new HashMap<>();
+        this.exitCells = new ArrayList<>();
         this.playersInEstate = new ArrayList<>();
-        this.cellObjectsInEstate = new ArrayList<>();
+        this.objectsInEstate = new ArrayList<>();
         this.availableCells = availableCells;
         this.weaponsInEstate = new ArrayList<>();
         this.estateImg = estateImg;
@@ -55,8 +51,6 @@ public class Estate {
      */
     public void redrawEstate(Board b, Graphics g) {
 
-
-
         int SIZE = 24;
 
         for (Cell c : estateCellList) {
@@ -72,38 +66,21 @@ public class Estate {
             int row = estateCellList.get(availableCells.get(i)).getRow();
             int col = estateCellList.get(availableCells.get(i)).getCol();
 
-            b.redrawCell(row, col, cellObjectsInEstate.get(i));
-
-
-
-            g.drawImage(cellObjectsInEstate.get(i).getCellImage(), row * SIZE, col * SIZE, SIZE, SIZE, null);
-
+            g.drawImage(objectsInEstate.get(i).getCellImage(), row * SIZE, col * SIZE, SIZE, SIZE, null);
         }
     }
-
-
-
-
 
     /**
      * Add exit cells so weh a player exits the estate knows where to put the player
      *
      * @param exitCell  the exit CEll itself
-     * @param direction the direction a player must go to get to the exit cell
      */
-    public void addExitCell(Cell exitCell, String direction) {
-        this.exitCells.put(direction, exitCell);
+    public void addExitCell(Cell exitCell) {
+        this.exitCells.add(exitCell);
     }
 
-    /**
-     * Add a player object to this estate asw ell as the player cell for drawing
-     *
-     * @param pl the player object to be added
-     * @param pc              the Cell for redrawing in the board
-     */
-    public void addPlayersInEstate(Player pl, PlayerCell pc) {
-        this.cellObjectsInEstate.add(pc);
-        this.playersInEstate.add(pl);
+    public boolean containsExit(Cell ex){
+        return exitCells.contains(ex);
     }
 
     /**
@@ -114,7 +91,7 @@ public class Estate {
      */
     public void addPlayersInEstate(Player pl) {
 
-        this.cellObjectsInEstate.add(new PlayerCell(0,0,pl.getName(), pl.getCellImage()));
+        this.objectsInEstate.add(pl);
         this.playersInEstate.add(pl);
     }
     /**
@@ -126,22 +103,9 @@ public class Estate {
 
     public void addWeaponInEstate(Weapon wp){
         this.weaponsInEstate.add(wp);
-        this.cellObjectsInEstate.add(new WeaponCell(0, 0, wp.getWepName(), wp.getImg()));
+        this.objectsInEstate.add(wp);
         wp.setEstate(this);
 
-    }
-
-    /**
-     * When a player tries to exit this method checks weather the given direction is valid
-     *
-     * @param direction direction the player wants to go
-     * @return the cell the player is going to
-     */
-    public Cell containsExit(String direction) {
-        if (exitCells.containsKey(direction)) {
-            return exitCells.get(direction);
-        }
-        return null;
     }
 
     /**
@@ -151,18 +115,7 @@ public class Estate {
      */
     public void removePlayersInEstate(Player aPlayerInEstate) {
         this.playersInEstate.remove(aPlayerInEstate);
-
-        Cell toRemove = null;
-
-        //Find the player in the list of estate cells and remove it
-        for (Cell c : cellObjectsInEstate) {
-            if (c.toString().equals(aPlayerInEstate.toString())) {
-                toRemove = c;
-            }
-        }
-        if (toRemove != null) {
-            this.cellObjectsInEstate.remove(toRemove);
-        }
+        this.objectsInEstate.remove(aPlayerInEstate);
     }
 
     /**
@@ -172,18 +125,7 @@ public class Estate {
      */
     public void removeWeaponInEstate(Weapon aWeapon){
         this.weaponsInEstate.remove(aWeapon);
-        Cell toRemove = null;
-
-        //Find the player in the list of estate cells and remove it
-        for (Cell c : cellObjectsInEstate) {
-            if (c.toString().equals(aWeapon.toString())) {
-                toRemove = c;
-            }
-        }
-        if (toRemove != null) {
-
-            this.cellObjectsInEstate.remove(toRemove);
-        }
+        this.objectsInEstate.remove(aWeapon);
     }
 
     public String getEstateName(){
@@ -196,9 +138,5 @@ public class Estate {
 
     public int getCol(){
         return  this.col;
-    }
-
-    public Image getEstateImg(){
-        return this.estateImg;
     }
 }

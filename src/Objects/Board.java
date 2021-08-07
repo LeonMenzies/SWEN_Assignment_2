@@ -23,31 +23,30 @@ public class Board {
     ArrayList<Weapon> weapons = new ArrayList<>();
     List<Player> players = new ArrayList<>();
     Cell[][] cells;
-    public final Pattern EXITCELLPATTERN = Pattern.compile("WV|AV|SV|DV|DH|SH|AM|SM|WP|AP|WC|DC");
 
     // @formatter:off
     String boardCells =
-            "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
                     "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
-                    "|__|__|HH|HH|HH|HH|HD|DH|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HD|HE|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
                     "|__|__|HH|HH|HH|HH|HH|__|__|__|__|__|__|__|__|__|__|MM|MM|MM|MM|MM|__|__|\n" +
-                    "|__|__|HH|HH|HH|HH|HH|__|__|__|__|GC|GC|__|__|__|AM|MD|MM|MM|MM|MM|__|__|\n" +
+                    "|__|__|HH|HH|HH|HH|HH|__|__|__|__|GC|GC|__|__|__|ME|MD|MM|MM|MM|MM|__|__|\n" +
                     "|__|__|HH|HH|HH|HD|HH|__|__|__|__|GC|GC|__|__|__|__|MM|MM|MM|MD|MM|__|__|\n" +
-                    "|__|__|__|__|__|SH|__|__|__|__|__|__|__|__|__|__|__|__|__|__|SM|__|__|__|\n" +
+                    "|__|__|__|__|__|HE|__|__|__|__|__|__|__|__|__|__|__|__|__|__|ME|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-                    "|__|__|__|__|__|__|__|__|__|__|__|__|WV|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|__|VE|__|__|__|__|__|__|__|__|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|VC|VC|VC|VD|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
-                    "|__|__|__|__|__|GC|GC|__|__|VC|VC|VC|VC|VC|VD|DV|__|GC|GC|__|__|__|__|__|\n" +
-                    "|__|__|__|__|__|GC|GC|__|AV|VD|VC|VC|VC|VC|VC|__|__|GC|GC|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|GC|GC|__|__|VC|VC|VC|VC|VC|VD|VE|__|GC|GC|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|GC|GC|__|VE|VD|VC|VC|VC|VC|VC|__|__|GC|GC|__|__|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|VC|VC|VD|VC|VC|VC|__|__|__|__|__|__|__|__|__|\n" +
-                    "|__|__|__|__|__|__|__|__|__|__|__|SV|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
+                    "|__|__|__|__|__|__|__|__|__|__|__|VE|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
-                    "|__|__|__|WC|__|__|__|__|__|__|__|__|__|__|__|__|__|__|WP|__|__|__|__|__|\n" +
+                    "|__|__|__|CE|__|__|__|__|__|__|__|__|__|__|__|__|__|__|PE|__|__|__|__|__|\n" +
                     "|__|__|CC|CD|CC|CC|CC|__|__|__|__|GC|GC|__|__|__|__|PP|PD|PP|PP|PP|__|__|\n" +
-                    "|__|__|CC|CC|CC|CC|CD|DC|__|__|__|GC|GC|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CD|CE|__|__|__|GC|GC|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
                     "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
-                    "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|AP|PD|PP|PP|PP|PP|__|__|\n" +
+                    "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|PE|PD|PP|PP|PP|PP|__|__|\n" +
                     "|__|__|CC|CC|CC|CC|CC|__|__|__|__|__|__|__|__|__|__|PP|PP|PP|PP|PP|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n" +
                     "|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|__|\n";
@@ -71,15 +70,6 @@ public class Board {
     }
 
 
-    /**
-     * Redraw the estates to update objects inside
-     */
-//    public void redrawEstates() {
-//        for (Map.Entry<String, Estate> mp : estates.entrySet()) {
-//            mp.getValue().redrawEstate(this);
-//        }
-//    }
-
     public void addWeapons(ArrayList<Weapon> wp) {
         this.weapons = wp;
     }
@@ -88,12 +78,16 @@ public class Board {
         return this.weapons;
     }
 
-    public List<Player> getPlayers(){
+    public List<Player> getPlayers() {
         return this.players;
     }
 
     public void addPlayer(Player p) {
         this.players.add(p);
+    }
+
+    public void removePlayer(Player p) {
+        this.players.remove(p);
     }
 
     public void loadCellImages() {
@@ -124,106 +118,111 @@ public class Board {
 
         //The switch checks for the cell type and add it to the 2d array that makes up the baord
         while (sc.hasNext()) {
+
             String next = sc.next();
             switch (next) {
                 case "__":
-                    cells[row][col++] = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = new FreeCell(row, col, cellImages.get("__"));
+                    col++;
                     break;
                 case "GC":
-                    cells[row][col++] = new GreyCell(row, col, cellImages.get("GC"));
+                    cells[row][col] = new GreyCell(row, col, cellImages.get("GC"));
+                    col++;
                     break;
                 case "CC":
                     EstateCell cc = new EstateCell(row, col, "Calamity", "Castle", false, cellImages.get("__"));
-
-                    cells[row][col++] = cc;
+                    cells[row][col] = cc;
                     estates.get("Calamity Door").addCell(cc);
+                    col++;
                     break;
                 case "CD":
                     EstateCell cd = new EstateCell(row, col, "Calamity", "Door", true, cellImages.get("__"));
-
-                    cells[row][col++] = cd;
+                    cells[row][col] = cd;
                     estates.get("Calamity Door").addCell(cd);
+                    col++;
                     break;
                 case "PP":
                     EstateCell pp = new EstateCell(row, col, "Peril", "Palace", false, cellImages.get("__"));
-
-                    cells[row][col++] = pp;
+                    cells[row][col] = pp;
                     estates.get("Peril Door").addCell(pp);
+                    col++;
                     break;
                 case "PD":
                     EstateCell pd = new EstateCell(row, col, "Peril", "Door", true, cellImages.get("__"));
-
-                    cells[row][col++] = pd;
+                    cells[row][col] = pd;
                     estates.get("Peril Door").addCell(pd);
+                    col++;
                     break;
                 case "MM":
                     EstateCell mm = new EstateCell(row, col, "Manic", "Manor", false, cellImages.get("__"));
-
-                    cells[row][col++] = mm;
+                    cells[row][col] = mm;
                     estates.get("Manic Door").addCell(mm);
+                    col++;
                     break;
                 case "MD":
                     EstateCell md = new EstateCell(row, col, "Manic", "Door", true, cellImages.get("__"));
-
-                    cells[row][col++] = md;
+                    cells[row][col] = md;
                     estates.get("Manic Door").addCell(md);
+                    col++;
                     break;
                 case "HH":
                     EstateCell hh = new EstateCell(row, col, "Haunted", "House", false, cellImages.get("__"));
-
-                    cells[row][col++] = hh;
+                    cells[row][col] = hh;
                     estates.get("Haunted Door").addCell(hh);
+                    col++;
                     break;
                 case "HD":
                     EstateCell hd = new EstateCell(row, col, "Haunted", "Door", true, cellImages.get("__"));
-
-                    cells[row][col++] = hd;
+                    cells[row][col] = hd;
                     estates.get("Haunted Door").addCell(hd);
+                    col++;
                     break;
                 case "VC":
                     EstateCell vc = new EstateCell(row, col, "Villa", "Celia", false, cellImages.get("__"));
-
-                    cells[row][col++] = vc;
+                    cells[row][col] = vc;
                     estates.get("Villa Door").addCell(vc);
+                    col++;
                     break;
                 case "VD":
                     EstateCell vd = new EstateCell(row, col, "Villa", "Door", true, cellImages.get("__"));
-
-                    cells[row][col++] = vd;
+                    cells[row][col] = vd;
                     estates.get("Villa Door").addCell(vd);
+                    col++;
                     break;
+                case "VE":
+                    FreeCell ve = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = ve;
+                    estates.get("Villa Door").addExitCell(ve);
+                    col++;
+                    break;
+                case "HE":
+                    FreeCell he = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = he;
+                    estates.get("Haunted Door").addExitCell(he);
+                    col++;
+                    break;
+                case "PE":
+                    FreeCell pe = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = pe;
+                    estates.get("Peril Door").addExitCell(pe);
+                    col++;
+                    break;
+                case "ME":
+                    FreeCell me = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = me;
+                    estates.get("Manic Door").addExitCell(me);
+                    col++;
+                    break;
+                case "CE":
+                    FreeCell ce = new FreeCell(row, col, cellImages.get("__"));
+                    cells[row][col] = ce;
+                    estates.get("Calamity Door").addExitCell(ce);
+                    col++;
+                    break;
+
                 default:
-
-                    //If the cell is an exit door cell this method add it to the correct estate as well as the exit direction
-                    if (EXITCELLPATTERN.matcher(next).find()) {
-                        Cell exitCell = new FreeCell(row, col, cellImages.get("__"));
-                        cells[row][col++] = exitCell;
-
-                        String key = next.substring(1, 2);
-                        String direction = next.substring(0, 1);
-
-                        switch (key) {
-                            case "V":
-                                estates.get("Villa Door").addExitCell(exitCell, direction);
-                                break;
-                            case "H":
-                                estates.get("Haunted Door").addExitCell(exitCell, direction);
-                                break;
-                            case "P":
-                                estates.get("Peril Door").addExitCell(exitCell, direction);
-                                break;
-                            case "M":
-                                estates.get("Manic Door").addExitCell(exitCell, direction);
-                                break;
-                            case "C":
-                                estates.get("Calamity Door").addExitCell(exitCell, direction);
-                                break;
-                            default:
-                        }
-                    } else {
-                        row++;
-                        col = 0;
-                    }
+                    row++;
+                    col = 0;
             }
         }
 
@@ -256,9 +255,9 @@ public class Board {
         this.cells = cells;
     }
 
-    public void setPlayer(Player p) {
-        cells[p.getRow()][p.getCol()] = new PlayerCell(p.getRow(), p.getCol(), p.getName(), cellImages.get("__"));
-    }
+//    public void setPlayer(Player p) {
+//        cells[p.getRow()][p.getCol()] = new PlayerCell(p.getRow(), p.getCol(), p.getName(), cellImages.get("__"));
+//    }
 
 
     public Estate getEstate(String name) {
@@ -287,7 +286,9 @@ public class Board {
 
             for (Cell c2 : c1) {
                 sb.append("|");
-                sb.append(c2.toString());
+                sb.append(String.valueOf(c2.getCol()));
+                sb.append(String.valueOf(c2.getRow()));
+                //sb.append(c2.toString());
             }
             sb.append("|");
             sb.append("\n");

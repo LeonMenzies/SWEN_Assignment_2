@@ -52,7 +52,7 @@ public class Player extends Move implements Cloneable, Movable {
         if (turn) {
             int d1 = dice1.nextInt(UPPERBOUND) + 1;
             int d2 = dice2.nextInt(UPPERBOUND) + 1;
-            System.out.println("You rolled a " +d1 + " and a "+ d2);
+            System.out.println("You rolled a " + d1 + " and a " + d2);
             steps = d1 + d2;
 
         }
@@ -78,7 +78,6 @@ public class Player extends Move implements Cloneable, Movable {
     }
 
 
-
     /**
      * Method for cloning the player
      *
@@ -93,198 +92,70 @@ public class Player extends Move implements Cloneable, Movable {
         return p;
     }
 
-    public void deSelect(){
-
-    }
 
     /**
      * after checking the move is valid move the player on the given board
      *
-     * @param b         the current board
+     * @param b the current board
      */
-    public boolean move(Board b, int xClick, int yClick) {
+    public boolean move(Board b, Cell selected) {
 
-        String direction;
+        //Move player out of estate
+        if (this.inEstate()) {
+            if (estateIn.containsExit(selected) && !visited.contains(selected)) {
 
-        int xDif = col - xClick;
-        int yDif = row -yClick;
+                this.row = selected.getRow();
+                this.col = selected.getCol();
 
+                estateIn.removePlayersInEstate(this);
+                estateIn = null;
+                b.addPlayer(this);
 
-        if (xDif == 1 && yDif == 0){
-            direction = "A";
-        } else if (xDif == -1 && yDif == 0){
-            direction = "D";
-        } else if(yDif == -1 && xDif == 0){
-            direction = "S";
-        } else if(yDif == 1 && xDif == 0){
-            direction = "W";
-        } else {
-            return false;
+                visited.add(b.getCell(row, col));
+                return true;
+
+            }
         }
 
-
-        if (isValid(b, direction)) {
-
-
-            Cell[][] cells = b.getCells();
-            Cell playerCell = cells[row][col];
-            cells[row][col] = new FreeCell(row, col, b.getCellImages().get("__"));
-
-            //Add the current cell to a visited arraylist for checking later
+        //Move player
+        if (isValid(b, selected)) {
+            this.row = selected.getRow();
+            this.col = selected.getCol();
             visited.add(b.getCell(row, col));
-
-            switch (direction) {
-                case "W":
-                    cells[row - 1][col] = playerCell;
-                    row = row - 1;
-                    b.setCells(cells);
-                    break;
-
-                case "A":
-                    cells[row][col - 1] = playerCell;
-                    col = col - 1;
-                    b.setCells(cells);
-                    break;
-
-                case "S":
-                    cells[row + 1][col] = playerCell;
-                    row = row + 1;
-                    b.setCells(cells);
-                    break;
-
-                case "D":
-                    cells[row][col + 1] = playerCell;
-                    col = col + 1;
-                    b.setCells(cells);
-                    break;
-
-                default:
-                    break;
-            }
-        }else if (this.getEstateIn() != null) {
-            isValidEstate(b, direction);
-
-        } else {
-           return false;
+            return true;
         }
-        return true;
-    }
+        return false;
 
-    /**
-     * Checks which direction the player wants to move and if the estate contains a door and if the the cell hasn't not already been visited this turn
-     * If direction is correct and cell unvisited player is removed from the state and redrawn outside the door
-     *
-     * @param b         the current board
-     * @param direction the direction the player wants to move
-     *
-     */
-
-    public void isValidEstate(Board b, String direction){
-        Cell[][] c = b.getCells();
-        //Check for a valid exit
-
-            Cell newPos = estateIn.containsExit(direction);
-            if(newPos != null) {
-                //Objects.Move the player to an exit point and remove them from the estate
-                if (checkVisited(c[newPos.getRow()][newPos.getCol()])) {
-                    estateIn.removePlayersInEstate(this);
-                    c[newPos.getRow()][newPos.getCol()] = new PlayerCell(newPos.getRow(), newPos.getCol(), this.name, b.getCellImages().get("__"));
-                    this.row = newPos.getRow();
-                    this.col = newPos.getCol();
-                    steps--;
-                    estateIn = null;
-                }else{
-                    System.out.println("Objects.Move is not valid");
-                }
-
-        }else{
-                System.out.println("Objects.Move is not valid");
-            }
     }
 
     /**
      * This method is for checking if a desired player move is a valid move or not
      * It also checks if the player is trying to enter an estate and reacts accordingly
      *
-     * @param b         the current board
-     * @param direction the direction the player wants to move
+     * @param b the current board
      * @return true or false if this is a vailid move
      */
     @Override
-    public boolean isValid(Board b, String direction) {
+    public boolean isValid(Board b, Cell selected) {
 
-        int tempRow = row;
-        int tempCol = col;
-
-        switch (direction) {
-            case "W":
-                tempRow--;
-                break;
-            case "A":
-                tempCol--;
-                break;
-            case "S":
-                tempRow++;
-                break;
-            case "D":
-                tempCol++;
-                break;
-            default:
-                break;
-        }
-
-        Cell[][] c = b.getCells();
-
-        //Check if player is currently in an estate and trying to leaving in a given direction
-        if (estateIn != null) {
-            return false;
-        }
-
-        //Make sure the move doesnt go out of bounds or is not a visited cell
-        if (outOfBounds(tempRow, tempCol) || !checkVisited(c[tempRow][tempCol])) {
-            return false;
-        }
-
-
-        if (c[tempRow][tempCol] != null) {
-            if (c[tempRow][tempCol] instanceof FreeCell) {
+        if (!visited.contains(selected) && selected instanceof FreeCell) {
+            if (Math.abs(this.row - selected.getRow()) + Math.abs(this.col - selected.getCol()) > 1) {
+                return false;
+            }
+            return true;
+        } else if (selected instanceof EstateCell) {
+            EstateCell ec = (EstateCell) selected;
+            if (ec.isDoor()) {
+                estateIn = b.getEstate(ec.getName());
+                estateIn.addPlayersInEstate(this);
+                b.removePlayer(this);
                 steps--;
                 return true;
             }
-            //If the player is trying to enter an estate make sure its entering a door cell and add it to that estate
-            if (c[tempRow][tempCol] instanceof EstateCell) {
-                EstateCell ec = (EstateCell) c[tempRow][tempCol];
-                if (ec.isDoor()) {
-                    estateIn = b.getEstate(ec.getName());
-                    estateIn.addPlayersInEstate(this, (PlayerCell) c[row][col]);
-                    steps--;
-                    return true;
-                }
-            }
         }
+
         return false;
-    }
 
-    /**
-     * Check weather the desired move is out of the board boundaries
-     *
-     * @param tempRow the temporary column to be checked
-     * @param tempCol the temporary row to be check
-     * @return true or false boolean to signify weather the move is out of bounds
-     */
-    private boolean outOfBounds(int tempRow, int tempCol) {
-        return tempCol > 23 || tempRow > 23 || tempCol < 0 || tempRow < 0;
-    }
-
-
-    /**
-     * Check weather a player is trying to re-visit a cell
-     *
-     * @param c the cell to be check
-     * @return true or false if the player has visited the given cell
-     */
-    public boolean checkVisited(Cell c) {
-        return !visited.contains(c);
     }
 
     /**
@@ -299,7 +170,7 @@ public class Player extends Move implements Cloneable, Movable {
     /**
      * Clear the steps for this player
      */
-    public void clearSteps(){
+    public void clearSteps() {
         this.steps = 0;
     }
 
@@ -329,7 +200,6 @@ public class Player extends Move implements Cloneable, Movable {
     /*
      * Getter and setters for this player object
      */
-
 
 
     public int getRow() {
@@ -392,12 +262,16 @@ public class Player extends Move implements Cloneable, Movable {
         hasGuessed = b;
     }
 
-    public Estate getEstateIn(){
+    public Estate getEstateIn() {
         return this.estateIn;
     }
 
-    public Image getCellImage(){
+    public Image getCellImage() {
         return cellImage;
+    }
+
+    public boolean inEstate() {
+        return estateIn != null;
     }
 
     public String getEstateInString() {
@@ -405,12 +279,6 @@ public class Player extends Move implements Cloneable, Movable {
             return "null";
         }
         return estateIn.getEstateName();
-    }
-
-    @Override
-    public void setCoord(int row, int col) {
-        this.row = row;
-        this.col = col;
     }
 
     /**

@@ -43,9 +43,6 @@ public class EstateCell extends Cells.Cell {
      */
     @Override
     public String toString() {
-        if (isDoor) {
-            return "__";
-        }
         return nameFirst.substring(0, 1) + nameSecond.substring(0, 1);
     }
 }
