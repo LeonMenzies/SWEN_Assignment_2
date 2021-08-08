@@ -855,7 +855,7 @@ public class Game extends Subject implements WindowListener {
 
 
         frame = new JFrame("Murder Madness");
-        frame.setSize(576, 720);
+        frame.setSize(576, 800);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
 
@@ -908,13 +908,15 @@ public class Game extends Subject implements WindowListener {
         buttons.add(endTurn);
 
         //Text area for information
-        textDisplay = new JTextArea();
+        textDisplay = new JTextArea(5, 10);
         textDisplay.setEditable(false);
+        JScrollPane scroll = new JScrollPane (textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scroll.setSize(576, 150);
         DefaultCaret caret = (DefaultCaret)textDisplay.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
-        controls.add(textDisplay);
+        controls.add(scroll);
         controls.add(buttons);
 
         frame.add(controls, BorderLayout.PAGE_END);
