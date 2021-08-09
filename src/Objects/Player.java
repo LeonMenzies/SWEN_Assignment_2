@@ -112,6 +112,7 @@ public class Player extends Move implements Cloneable, Movable {
                 b.addPlayer(this);
 
                 visited.add(b.getCell(row, col));
+                steps--;
                 return true;
 
             }
@@ -142,9 +143,10 @@ public class Player extends Move implements Cloneable, Movable {
             if (Math.abs(this.row - selected.getRow()) + Math.abs(this.col - selected.getCol()) > 1) {
                 return false;
             }
+            steps--;
             return true;
         //Add player into the estate
-        } else if (selected instanceof EstateCell) {
+        } else if ((selected instanceof EstateCell)) {
             EstateCell ec = (EstateCell) selected;
             if (ec.isDoor()) {
                 estateIn = b.getEstate(ec.getName());

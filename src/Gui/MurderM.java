@@ -19,6 +19,7 @@ import java.awt.event.WindowListener;
 import java.util.ArrayList;
 
 public class MurderM extends Subject implements WindowListener {
+
     private Game game = new Game(this);
     private final JFrame frame;
     private String[] names;
@@ -39,11 +40,15 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public void setUp() {
-        this.game = new Game(this);
-        game.setGameStarted(true);
-        game.setUp(names.length);
-        notifyObservers();
-        game.playGame();
+        setUpPlayerNames();
+        if(names != null) {
+            this.game = new Game(this);
+            game.setGameStarted(true);
+
+            game.setUp(names.length);
+            notifyObservers();
+            game.playGame();
+        }
     }
 
     public void guiSetup() {
@@ -67,8 +72,14 @@ public class MurderM extends Subject implements WindowListener {
 
                     Cell selected = board.getCell(yClick, xClick);
 
-                    if (game.getCurrent() != null && game.getCurrent().move(board, selected)) {
-                        notifyObservers();
+                    if (game.getCurrent() != null ) {
+                        if(game.getCurrent().getSteps() != 0) {
+                            if (game.getCurrent().move(board, selected)) {
+                                notifyObservers();
+                            }
+                        }else{
+                            errorMessage("You are out of steps or need to roll!", "Invalid Move");
+                        }
                     }
                 }
             }
@@ -115,6 +126,8 @@ public class MurderM extends Subject implements WindowListener {
 
         options.add(i1);
         i1.addActionListener(e -> this.setUp());
+        i2.addActionListener(e -> this.restart());
+        i3.addActionListener(e->quit());
         options.add(i2);
         options.add(i3);
         menu.add(options);
@@ -263,9 +276,7 @@ public class MurderM extends Subject implements WindowListener {
                 JOptionPane.ERROR_MESSAGE);
     }
 
-
-    @Override
-    public void windowOpened(WindowEvent e) {
+    public void setUpPlayerNames(){
         Object[] options = {"3",
                 "4"};
         int n = JOptionPane.showOptionDialog(frame,
@@ -283,57 +294,84 @@ public class MurderM extends Subject implements WindowListener {
             names = new String[4];
         }
 
+        if(names !=  null) {
+            JPanel dialogPanel = new JPanel(new GridBagLayout());
 
-        JPanel dialogPanel = new JPanel(new GridBagLayout());
+            Border titleBorder = BorderFactory.createTitledBorder("Player Information");
+            Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
+            Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
+            dialogPanel.setBorder(combinedBorder);
+            JTextField player1Name = new JTextField(5);
+            JTextField player2Name = new JTextField(5);
+            JTextField player3Name = new JTextField(5);
 
-        Border titleBorder = BorderFactory.createTitledBorder("Player Information");
-        Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-        Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
-        dialogPanel.setBorder(combinedBorder);
-        JTextField player1Name = new JTextField(5);
-        JTextField player2Name = new JTextField(5);
-        JTextField player3Name = new JTextField(5);
-
-        player1Name.setText("Harry");
-        player2Name.setText("Leon");
-        player3Name.setText("Terry");
-
-
-        JTextFieldChecker JC = new JTextFieldChecker();
-        JC.addTextField(player1Name);
-        JC.addTextField(player2Name);
-        JC.addTextField(player3Name);
+            player1Name.setText("Harry");
+            player2Name.setText("Leon");
+            player3Name.setText("Terry");
 
 
-        dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
-        dialogPanel.add(player1Name, createGbc(1, 0));
-        dialogPanel.add(new JLabel("Player 2 Name:"), createGbc(0, 1));
-        dialogPanel.add(player2Name, createGbc(1, 1));
-        dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
-        dialogPanel.add(player3Name, createGbc(1, 2));
-        if (names.length == 4) {
-            JTextField player4Name = new JTextField(5);
-            JC.addTextField(player4Name);
-            dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
-            dialogPanel.add(player4Name, createGbc(1, 3));
-        }
-        while (true) {
-            int result = JOptionPane.showConfirmDialog(null, dialogPanel,
-                    "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE);
+            JTextFieldChecker JC = new JTextFieldChecker();
+            JC.addTextField(player1Name);
+            JC.addTextField(player2Name);
+            JC.addTextField(player3Name);
 
-            if (result == JOptionPane.OK_OPTION) {
 
-                if (!JC.isDataEntered()) {
-                    JOptionPane.showMessageDialog(frame,
-                            "All player names must be entered",
-                            "Name's Error",
-                            JOptionPane.ERROR_MESSAGE);
-                } else {
-                    break;
+            dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
+            dialogPanel.add(player1Name, createGbc(1, 0));
+            dialogPanel.add(new JLabel("Player 2 Name:"), createGbc(0, 1));
+            dialogPanel.add(player2Name, createGbc(1, 1));
+            dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
+            dialogPanel.add(player3Name, createGbc(1, 2));
+            if (names.length == 4) {
+                JTextField player4Name = new JTextField(5);
+                JC.addTextField(player4Name);
+                dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
+                dialogPanel.add(player4Name, createGbc(1, 3));
+            }
+            while (true) {
+                int result = JOptionPane.showConfirmDialog(null, dialogPanel,
+                        "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE);
+
+                if (result == JOptionPane.OK_OPTION) {
+
+                    if (!JC.isDataEntered()) {
+                        JOptionPane.showMessageDialog(frame,
+                                "All player names must be entered",
+                                "Name's Error",
+                                JOptionPane.ERROR_MESSAGE);
+                    } else {
+                        break;
+                    }
                 }
             }
         }
+    }
+
+    public void restart(){
+        frame.dispose();
+        Board board = new Board(24, 24);
+        board.setup();
+
+        BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
+        boardCanvas.setSize(576, 576);
+        MurderM m = new MurderM(board, boardCanvas);
+        m.guiSetup();
+    }
+
+    public void quit(){
+        int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
+        if (result == 0) {
+           System.exit(0);
+        } else if (result == 2) {
+            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        }
+    }
+
+
+    @Override
+    public void windowOpened(WindowEvent e) {
+      this.displayMessage("Welcome to Murder Mystery!");
     }
 
     private static GridBagConstraints createGbc(int x, int y) {
@@ -356,12 +394,7 @@ public class MurderM extends Subject implements WindowListener {
 
     @Override
     public void windowClosing(WindowEvent e) {
-        int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
-        if (result == 0) {
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        } else if (result == 2) {
-            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        }
+       quit();
     }
 
     @Override
@@ -395,8 +428,8 @@ public class MurderM extends Subject implements WindowListener {
 
         BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
         boardCanvas.setSize(576, 576);
-        MurderM frame = new MurderM(board, boardCanvas);
-        frame.guiSetup();
+        MurderM m = new MurderM(board, boardCanvas);
+        m.guiSetup();
 
     }
 }
