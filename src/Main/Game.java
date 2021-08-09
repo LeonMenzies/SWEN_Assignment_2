@@ -406,7 +406,7 @@ public class Game{
         playerSetUp(names);
         setUpDeck();
         generateMurder();
-       
+
         dealCards();
         Random rand = new Random();
         int i = rand.nextInt(players.size());
