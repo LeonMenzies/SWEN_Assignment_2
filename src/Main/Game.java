@@ -58,13 +58,16 @@ public class Game{
 
     public void playGame(){
         if(!gameWon && !gameOver) {
-            playerTurn = playerOrder.poll();
-            currentPlayer = players.get(playerTurn);
-            currentPlayer.setTurn(true);
-            gui.notifyObservers();
-            currentPlayer.setRollStatus(false);
-            currentPlayer.setGuessStatus(false);
-            gui.displayPlayer(currentPlayer.getName());
+            Integer pt = playerOrder.poll();
+            if(pt != null) {
+                playerTurn = pt;
+                currentPlayer = players.get(playerTurn);
+                currentPlayer.setTurn(true);
+                gui.notifyObservers();
+                currentPlayer.setRollStatus(false);
+                currentPlayer.setGuessStatus(false);
+                gui.displayPlayer(currentPlayer.getName());
+            }
         }else if(gameWon && !gameOver){
             gui.displayOkOption(currentPlayer.getName() + " has won!", "Winner");
         }else if(!gameWon){
