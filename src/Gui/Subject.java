@@ -7,6 +7,7 @@ public class Subject {
     List<Observer> observers = new ArrayList<>();
 
     public void notifyObservers(){
+
         for(Observer o : observers){
             o.update();
         }

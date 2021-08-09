@@ -21,8 +21,9 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class Game extends Subject implements WindowListener {
+public class Game{
     ArrayList<Player> players = new ArrayList<>();
+    Queue<Integer> playerOrder = new ArrayDeque<Integer>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
     ArrayList<Card> deck = new ArrayList<>();
     ArrayList<Card> tempDeck = new ArrayList<>();
@@ -38,163 +39,47 @@ public class Game extends Subject implements WindowListener {
     JButton roll;
     JTextArea textDisplay;
     JTextArea textArea;
+    int playerTurn;
+    private boolean gameStarted = false;
     Player winner = null;
     Player currentPlayer = null;
+    private MurderM gui;
     //Pattern MovePat = Pattern.compile("[RGHFWASDE]");
     //Pattern dirPat = Pattern.compile("[WASD]");
 
-    private String[] names;
-    private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
-    private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
 
-    private Thread gameLoop;
-    private boolean isRunning;
-    private static Board board;
-    private static BoardCanvas boardCanvas;
+
+    private final Board board;
+
     private JFrame frame;
     private static Game game;
 
 
-    public Game() {
-        super.addObserver(boardCanvas);
+    public Game(MurderM gui) {
+        this.board = gui.getBoard();
+
+        this.gui = gui;
     }
 
-    public static void main(String[] args) {
-
-
-        board = new Board(24, 24);
-        board.setup();
-        boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
-        game = new Game();
-
-        game.setupGui();
-
+    public Player getCurrent(){
+        return currentPlayer;
     }
 
 
-    /**
-     * Allows the player to play game via a serious of inputs into the console
-     *
-     * @param p current player
-     * @return true of false if the player has won
-     */
-
-    public boolean playersTurn(Player p) {
-
-        Scanner input = new Scanner(System.in);
-        String in;
-        while (true) {
 
 
-            //sets up the player for there turn clears all the variables from last turn
-            if (!p.getTurn()) {
-                System.out.print("It is " + p.getName() + "'s turn please make sure they have the tablet and enter any key to continue: ");
-                input.next();
-                p.setTurn(true);
-                p.setRollStatus(false);
-                p.setGuessStatus(true);
-                p.clearVisited();
+    public void playGame(){
+        playerTurn = playerOrder.poll();
+        currentPlayer = players.get(playerTurn);
+        currentPlayer.setTurn(true);
+        currentPlayer.setRollStatus(false);
+        currentPlayer.setGuessStatus(false);
 
-            }
+        gui.displayPlayer(currentPlayer.getName());
+    }
 
-
-            guess.addActionListener(e -> makeGuess());
-            //Display the board before the players turn and there steps
-            System.out.println(board);
-            System.out.println(p.getName() + " has " + p.getSteps() + " number of steps");
-
-            //if player has not rolled option is displayed
-            if (!p.getRollStatus()) {
-                System.out.println("R(Roll), H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Objects.Move)");
-            } else {
-                System.out.println("H(Show Hand), G(guess), F(Final Guess), E(END TURN) or WASD(Objects.Move)");
-            }
-
-            in = input.next().toUpperCase();
-
-            //      in = checkInput(in);
-
-            //rolls the dice for the player and makes so they cant roll again
-            if (in.equals("R") && !p.getRollStatus()) {
-                p.roll();
-                p.setRollStatus(true);
-
-            } else if (in.equals("R") && p.getRollStatus()) {
-                System.out.println("Already Rolled");
-
-
-            }
-            //if input matches a move direction moves the player and updates there steps unless they are out of steps
-//            Matcher matcher = dirPat.matcher(in);
-//            boolean matchFound = matcher.matches();
-//            if (matchFound && p.getSteps() != 0) {
-//                p.move(board, in);
-//                this.notifyObservers();
-//
-//            } else if (matchFound && p.getSteps() == 0) {
-//                System.out.println("You are out of steps or please roll");
-//
-//            }
-
-            if (in.equals("H")) {
-                p.printHand();
-
-            }
-
-            //set so player cant make another guess this turn, gets the order the following players will make a guess
-            //adds the cards to the refute list, clears the screen then displays the refute cards for the player
-            //also checks to see if the play is in an estate
-            if (in.equals("G") && !p.getGuessStatus() && !p.getEstateInString().equals("null")) {
-                p.setGuessStatus(true);
-                refuteOrder(p);
-                makeGuess(p);
-                refuteCards.clear();
-
-                //      refute(p.getGuess());
-
-                System.out.println("Please past the tablet back to " + p.getName());
-                input.next();
-                System.out.println("Refute cards are: ");
-                for (int i = 0; i < refuteCards.size(); i++) {
-                    System.out.println(i + ": " + refuteCards.get(i).getName());
-                }
-
-            } else if (in.equals("G") && p.getGuessStatus() && !p.getEstateInString().equals("null")) {
-                System.out.println("You have already guessed");
-
-            } else if (in.equals("G") && !p.getGuessStatus() && p.getEstateInString().equals("null")) {
-                System.out.println("You need to be in an estate to make a guess");
-            }
-
-            //player makes a guess then the cards a checked against the circumstance
-            //if player is successful they have won otherwise they are out
-            //also checks to see if the player is in a estate
-            if (in.equals("F") && !p.getGuessStatus() && !p.getEstateInString().equals("null")) {
-                makeGuess(p);
-                p.setHasWon(checkWin(p.getGuess()));
-                if (p.getHasWon()) {
-                    winner = p;
-                    return true;
-                } else {
-                    p.setIsout(true);
-                    System.out.println("You are out " + p.getName() + " you can't guess or move but can still refute");
-                }
-                return false;
-            } else if (in.equals("F") && !p.getGuessStatus() && p.getEstateInString().equals("null")) {
-                System.out.println("You must be in an estate to make a final guess");
-            }
-
-            //ends the players turn
-            if (in.equals("E") && (p.getSteps() == 0 || !p.getEstateInString().equals("null"))) {
-                p.clearSteps();
-                p.setTurn(false);
-
-                return false;
-            } else if (in.equals("E") && (p.getSteps() != 0 || p.getEstateInString().equals("null"))) {
-                System.out.println("You must be in an estate or out of steps to end your turn");
-            }
-        }
-
+    public void setGameStarted(boolean b){
+        gameStarted = b;
     }
 
     /**
@@ -219,71 +104,21 @@ public class Game extends Subject implements WindowListener {
     }
 
 
-    public void setUpGameLoop() {
-        gameLoop = new Thread(() -> {
-            while (isRunning) {
-                while (!gameWon) {
-                    for (Player p : players) {
-                        if (!p.getIsOut()) {
-                            JOptionPane.showMessageDialog(frame, "It is " + p.getName() + " turn please past the tablet to them");
-
-                            currentPlayer = p;
-
-                            p.setTurn(true);
-                            notifyObservers();
-
-                            playersturn(p);
-                        }
-                    }
-                }
-
-            }
-        });
-    }
-
-    public void playersturn(Player p) {
-        p.setRollStatus(false);
-        p.setGuessStatus(false);
-        p.clearVisited();
-
-        while (p.getTurn()) {
-
-            roll.addActionListener(e -> {
-                if(!p.getRollStatus()){
-                    p.roll();
-                    p.setRollStatus(true);
-                    System.out.println(p.getSteps());
-                }
-            });
-
-            guess.addActionListener(e -> makeGuess());
-            endTurn.addActionListener(e -> endTurn());
-
-
-            if(!p.getTurn()){
-                break;
-            }
-        }
-    }
 
     public void endTurn(){
 
-        if(currentPlayer.getTurn()) {
 
-            JPanel jpane = new JPanel();
-            int result =  JOptionPane.showConfirmDialog(jpane,
-                    "Do you want to end your turn?", "End Turn: ",
-                    JOptionPane.OK_CANCEL_OPTION);
-
-            if(result == JOptionPane.OK_OPTION){
-                if(currentPlayer.getSteps() == 0 || !currentPlayer.getEstateInString().equals("null")){
-                    currentPlayer.clearSteps();
-                    currentPlayer.setTurn(false);
+        if(gameStarted) {
+            int result = gui.displayOkOption("Are you sure want to end your turn?", "End Turn");
+            if(result == 0) {
+                if(currentPlayer.getSteps() == 0 || !currentPlayer.getEstateInString().equals("null")) {
+                    if (!currentPlayer.getIsOut()) {
+                        currentPlayer.setTurn(false);
+                        playerOrder.offer(playerTurn);
+                    }
+                    playGame();
                 }else{
-                    JOptionPane.showMessageDialog(frame,
-                            "You must be out of steps to end or in an Estate to end your turn",
-                            "End Turn Error",
-                            JOptionPane.ERROR_MESSAGE);
+                    gui.errorMessage("You must be out of steps or in an estate to end your turn", "End turn Error");
                 }
             }
 
@@ -291,48 +126,22 @@ public class Game extends Subject implements WindowListener {
     }
 
     public void makeGuess() {
-        System.out.println("guess");
-        if (!currentPlayer.getGuessStatus()) {
-
-            ArrayList<Card> buttons = new ArrayList<>();
+        if(gameStarted) {
             guessDeck.clear();
             refuteCards.clear();
-            for (Card c : tempDeck) {
-                if (c instanceof EstateCard) {
-                    if (!c.getName().equals("Haunted House")) {
-                        continue;
+            if (!currentPlayer.getGuessStatus()) {
+                guessDeck = gui.makeGuess(tempDeck);
+                if (guessDeck.size() > 0) {
+                    for (Card c : guessDeck) {
+                        System.out.println(c.getName());
                     }
+                    currentPlayer.setGuessStatus(true);
                 }
-                buttons.add(c);
 
-                guessDeck.add(c.clone());
-
-
+                // refute(guessDeck);
+            } else {
+                gui.errorMessage("You have already made a guess or need to be in an estate", "Guess Error");
             }
-            GuessPanel jpane = new GuessPanel(buttons);
-
-
-            while (true) {
-                int result = JOptionPane.showConfirmDialog(null, jpane,
-                        "Please Select three cards", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE);
-                if (result == JOptionPane.OK_OPTION) {
-
-                    if (!jpane.cardCheck()) {
-                        JOptionPane.showMessageDialog(frame,
-                                "Select Three Cards",
-                                "Card Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        guessDeck = jpane.selectedCards();
-                        break;
-                    }
-                } else if (result == JOptionPane.CANCEL_OPTION) {
-                    break;
-                }
-            }
-            currentPlayer.setGuessStatus(true);
-            refute(guessDeck);
         }
 
     }
@@ -377,68 +186,7 @@ public class Game extends Subject implements WindowListener {
 
     }
 
-//    /**
-//     * Goes through all the players aside from the guesser and checks if they can refute
-//     *
-//     * @param guess list of the current guess
-//     */
-//    public void refute(List<Card> guess) {
-//        //goes through the list of players in the correct refute order displaying the current guess cards
-//        for (int i = 0; i < tempPlayers.size(); i++) {
-//            while (true) {
-//                System.out.println("The current Guess is:");
-//                for (Card c : guess) {
-//                    System.out.print(c.getName() + " ");
-//                }
-//                System.out.println();
-//                //prints out who's turn it is to refute and there cards
-//                Scanner input = new Scanner(System.in);
-//                System.out.println("It is " + tempPlayers.get(i).getName() + "'s time to make a refute ");
-//                tempPlayers.get(i).printHand();
-//                System.out.println("Please pick a card that refutes eg 1 or enter 4 if you cant refute");
-//                String in = input.next();
-//                //method checks to see if they have entered a number
-//                if (isNumeric(in)) {
-//                    int j = Integer.parseInt(in.substring(0, 1));
-//                    if (j > tempPlayers.get(i).getHand().size() - 1 && j != 4) {
-//                        System.out.println("Please enter a valid number");
-//
-//                    }
-//                    //following ifs check if they can refute or if the refute is legit
-//                    else if (j == 4) {
-//                        boolean check = checkRefute(guess, tempPlayers.get(i).getHand());
-//                        if (check) {
-//                            System.out.println("You can refute please try again");
-//
-//                        } else {
-//                            break;
-//                        }
-//                    } else {
-//                        //pulls the card and checks it is a refute
-//                        Card r = tempPlayers.get(i).getHand().get(j);
-//                        boolean isRefute = isARefute(guess, r);
-//                        //if refute is legit card is added to one to show player making the guess
-//                        if (isRefute) {
-//                            //player is removed from the list and the next player goes
-//                            Player temp = players.get(i);
-//                            tempPlayers.remove(temp);
-//                            refuteCards.add(r);
-//                            break;
-//                        } else {
-//                            System.out.println("This refute is incorrect try again or select can't refute");
-//
-//                        }
-//                    }
-//
-//
-//                }
-//
-//
-//            }
-//
-//        }
-//
-//    }
+
 
     /**
      * Checks to see if the card refute is a legit refute
@@ -476,96 +224,8 @@ public class Game extends Subject implements WindowListener {
         return false;
     }
 
-    /**
-     * Checks to see if a String is an int
-     *
-     * @param str String to be checked
-     * @return true or false if can be parsed as int or not
-     */
-    public boolean isNumeric(String str) {
-        try {
-            Integer.parseInt(str);
-            return true;
-        } catch (NumberFormatException e) {
-            return false;
-        }
-    }
-
-    /**
-     * Allows the play to make a guess of one of each card, the estate being the estate they are currently in
-     *
-     * @param p player making the guess
-     */
-
-    public void makeGuess(Player p) {
-
-        //clears the current players guess array and prints all the cards in the deck for them
-        p.clearGuess();
-        guessDeck.clear();
-        int count = 0;
-        for (Card c : tempDeck) {
-            if (c instanceof EstateCard) {
-                if (!c.getName().equals(p.getEstateInString())) {
-                    continue;
-                }
-            }
-            guessDeck.add(c.clone());
-            System.out.println(count + ": " + c.getName());
-            count++;
-        }
-
-        //int and strings required for selecting the right cards from the deck
-        int i;
-        int j;
-        int k;
-        String cardC;
-        String cardE;
-        String cardW;
-        while (true) {
-            Scanner input = new Scanner(System.in);
-            String in;
-            System.out.println("Please select 3 cards as your guess eg 1,4,9");
-            in = input.next();
-
-            if (in.length() != 5) {
-                System.out.println("Please select three cards");
-
-            } else {
-                //brings the input into substrings of the correct numbers
-                cardC = in.substring(0, 1);
-                cardE = in.substring(2, 3);
-                cardW = in.substring(4, 5);
 
 
-                //need to check that the strings input are actually numbers
-                if (isNumeric(cardC) && isNumeric(cardE) && isNumeric(cardW)) {
-                    i = Integer.parseInt(cardC);
-                    j = Integer.parseInt(cardE);
-                    k = Integer.parseInt(cardW);
-                    //cards are in order from character to estate to weapon so if one of the numbers is out means player grabbed two or more of one type
-                    if (i > 3 || j != 4 || (k < 5 || k > 9)) {
-                        System.out.println("Please pick one of each card");
-
-                    } else {
-                        break;
-                    }
-                }
-            }
-
-
-        }
-        //generates the three cards of each type that the play is guessing
-        //and add them to the players guess array
-        CharacterCard gWho = (CharacterCard) guessDeck.get(i);
-        EstateCard gWhere = (EstateCard) guessDeck.get(j);
-        WeaponCard gWhat = (WeaponCard) guessDeck.get(k);
-        p.addGuess(gWho);
-        p.addGuess(gWhere);
-        p.addGuess(gWhat);
-
-        moveCharacters(p, gWhat, gWho);
-
-    }
 
     /**
      * Objects.Move the the weapon and player the on the board into the estate that the player is making the guess in
@@ -697,9 +357,13 @@ public class Game extends Subject implements WindowListener {
         players.add(new Player("Lucilla", 1, 11, board.getCellImages().get("Lucilla")));
         players.add(new Player("Bert", 9, 1, board.getCellImages().get("Bert")));
         players.add(new Player("Malina", 22, 9, board.getCellImages().get("Malina")));
+        playerOrder.add(0);
+        playerOrder.add(1);
+        playerOrder.add(2);
 
         //4 player gets added in if necessary
         if (numPlayers == 4) {
+            playerOrder.add(3);
             players.add(new Player("Percy", 14, 22, board.getCellImages().get("Percy")));
         }
 
@@ -709,25 +373,22 @@ public class Game extends Subject implements WindowListener {
         }
 
 
-        boardCanvas.repaint();
-
     }
 
-    public void startgame() {
+    public void setUp(int playerSize){
+        playerSetUp(playerSize);
         setUpDeck();
-
         generateMurder();
         dealCards();
-
         Random rand = new Random();
         int i = rand.nextInt(players.size());
         Player p = players.get(i);
-        //then generates the starting order based on who starts first
         generateStartingOrder(p);
+        weaponSetup();
 
-        this.isRunning = true;
-        this.gameLoop.start();
+
     }
+
 
     /**
      * Generates the Weapons then randomly distributes them through out the estates
@@ -849,267 +510,6 @@ public class Game extends Subject implements WindowListener {
      * Clears the console screen so other players can't see what the other players have done
      */
 
-
-    public void setupGui() {
-
-
-
-        frame = new JFrame("Murder Madness");
-        frame.setSize(576, 800);
-        frame.setResizable(false);
-        frame.setLayout(new BorderLayout());
-
-        boardCanvas.setSize(576, 576);
-        frame.add(boardCanvas, BorderLayout.CENTER);
-
-        boardCanvas.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mousePressed(MouseEvent e) {
-                super.mousePressed(e);
-
-                int xClick = (int)Math.floor(e.getX() / 24.0);
-                int yClick = (int)Math.floor(e.getY() / 24.0) ;
-
-                if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
-
-                    Cell selected = board.getCell(yClick, xClick);
-
-                    if(currentPlayer != null && currentPlayer.move(board, selected)){
-                        notifyObservers();
-                    } else {
-                        UIPrint("Invalid Move");
-                    }
-                }
-            }
-        });
-
-
-
-        this.setUpGameLoop();
-        //Panel to hold the buttons and the text panel
-        JPanel controls = new JPanel();
-
-        controls.setLayout(new BoxLayout(controls, BoxLayout.Y_AXIS));
-
-        //panel to hold the buttons down the bottom
-        JPanel buttons = new JPanel();
-        buttons.setLayout(new FlowLayout());
-
-        roll = new JButton("Roll");
-        JButton showHand = new JButton("Show Hand");
-        guess = new JButton("Make Guess");
-        JButton finalGuess = new JButton("Make Final Guess");
-        endTurn = new JButton("End Turn");
-
-        buttons.add(roll);
-        buttons.add(showHand);
-        buttons.add(guess);
-        buttons.add(finalGuess);
-        buttons.add(endTurn);
-
-        //Text area for information
-        textDisplay = new JTextArea(5, 10);
-        textDisplay.setEditable(false);
-        JScrollPane scroll = new JScrollPane (textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scroll.setSize(576, 150);
-        DefaultCaret caret = (DefaultCaret)textDisplay.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-
-        controls.add(scroll);
-        controls.add(buttons);
-
-        frame.add(controls, BorderLayout.PAGE_END);
-
-
-        addMenu();
-
-        //Create the text field
-        frame.addWindowListener(this);
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
-        try {
-            UIManager.setLookAndFeel(new NimbusLookAndFeel());
-            UIManager.put("control", new Color(58,58,59));
-            UIManager.put("info", new Color(58,58,59));
-            UIManager.put("nimbusBase", new Color(28, 28, 30));
-            UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
-            UIManager.put("nimbusDisabledText", new Color(58,58,59));
-            UIManager.put("nimbusFocus", new Color(115, 164, 209));
-            UIManager.put("nimbusGreen", new Color(176, 179, 50));
-            UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
-            UIManager.put("nimbusLightBackground", new Color(18, 30, 49));
-            UIManager.put("nimbusOrange", new Color(191, 98, 4));
-            UIManager.put("nimbusRed", new Color(169, 46, 34));
-            UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
-            UIManager.put("nimbusSelectionBackground", new Color(72,72,74));
-            UIManager.put("text", new Color(230, 230, 230));
-            SwingUtilities.updateComponentTreeUI(frame);
-        } catch (UnsupportedLookAndFeelException exc) {
-            System.err.println("Nimbus: Unsupported Look and feel!");
-        }
-
-        frame.setVisible(true);
-    }
-
-    public void UIPrint(String s){
-        if(currentPlayer != null) {
-            textDisplay.setText("Steps: " + currentPlayer.getSteps() + " | " + s + "\n");
-        }
-    }
-
-    public void addMenu() {
-        JMenuItem i1, i2, i3;
-
-        JMenuBar menu = new JMenuBar();
-        JMenu options = new JMenu("Options");
-
-        i1 = new JMenuItem("Start");
-        i2 = new JMenuItem("Restart");
-        i3 = new JMenuItem("Quit");
-
-        i1.addActionListener(e -> startgame());
-
-        options.add(i1);
-        options.add(i2);
-        options.add(i3);
-        menu.add(options);
-        frame.setJMenuBar(menu);
-    }
-
-
-    @Override
-    public void windowOpened(WindowEvent e) {
-        Object[] options = {"3",
-                "4"};
-        int n = JOptionPane.showOptionDialog(frame,
-                "How many players?",
-                "Players",
-                JOptionPane.YES_NO_OPTION,
-                JOptionPane.QUESTION_MESSAGE,
-                null,
-                options,
-                options[0]);
-
-        if (n == JOptionPane.YES_OPTION) {
-            names = new String[3];
-        } else if (n == JOptionPane.NO_OPTION) {
-            names = new String[4];
-        }
-
-        game.playerSetUp(names.length);
-        game.weaponSetup();
-
-
-        JPanel dialogPanel = new JPanel(new GridBagLayout());
-
-        Border titleBorder = BorderFactory.createTitledBorder("Player Information");
-        Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-        Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
-        dialogPanel.setBorder(combinedBorder);
-        JTextField player1Name = new JTextField(5);
-        JTextField player2Name = new JTextField(5);
-        JTextField player3Name = new JTextField(5);
-
-        player1Name.setText("Harry");
-        player2Name.setText("Leon");
-        player3Name.setText("Terry");
-
-
-        JTextFieldChecker JC = new JTextFieldChecker();
-        JC.addTextField(player1Name);
-        JC.addTextField(player2Name);
-        JC.addTextField(player3Name);
-
-
-
-        dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
-        dialogPanel.add(player1Name, createGbc(1, 0));
-        dialogPanel.add(new JLabel("Player 2 Name:"), createGbc(0, 1));
-        dialogPanel.add(player2Name, createGbc(1, 1));
-        dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
-        dialogPanel.add(player3Name, createGbc(1, 2));
-        if (names.length == 4) {
-            JTextField player4Name = new JTextField(5);
-            JC.addTextField(player4Name);
-            dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
-            dialogPanel.add(player4Name, createGbc(1, 3));
-        }
-        while (true) {
-            int result = JOptionPane.showConfirmDialog(null, dialogPanel,
-                    "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
-                    JOptionPane.PLAIN_MESSAGE);
-
-            if (result == JOptionPane.OK_OPTION) {
-
-                if (!JC.isDataEntered()) {
-                    JOptionPane.showMessageDialog(frame,
-                            "All player names must be entered",
-                            "Name's Error",
-                            JOptionPane.ERROR_MESSAGE);
-                } else {
-                    break;
-                }
-            }
-        }
-    }
-
-    private static GridBagConstraints createGbc(int x, int y) {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = x;
-        gbc.gridy = y;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
-
-        gbc.anchor = (x == 0) ? GridBagConstraints.WEST : GridBagConstraints.EAST;
-        gbc.fill = (x == 0) ? GridBagConstraints.BOTH
-                : GridBagConstraints.HORIZONTAL;
-
-        gbc.insets = (x == 0) ? WEST_INSETS : EAST_INSETS;
-        gbc.weightx = (x == 0) ? 0.1 : 1.0;
-        gbc.weighty = 1.0;
-        return gbc;
-    }
-
-
-    @Override
-    public void windowClosing(WindowEvent e) {
-
-        int result = JOptionPane.showConfirmDialog(frame,
-                "Do you want to Exit ?", "Exit Confirmation : ",
-                JOptionPane.YES_NO_OPTION);
-        if (result == JOptionPane.YES_OPTION) {
-            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        } else if (result == JOptionPane.NO_OPTION) {
-            frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
-        }
-
-    }
-
-    @Override
-    public void windowClosed(WindowEvent e) {
-
-    }
-
-    @Override
-    public void windowIconified(WindowEvent e) {
-
-    }
-
-    @Override
-    public void windowDeiconified(WindowEvent e) {
-
-    }
-
-    @Override
-    public void windowActivated(WindowEvent e) {
-
-    }
-
-    @Override
-    public void windowDeactivated(WindowEvent e) {
-
-    }
 
 
 }
