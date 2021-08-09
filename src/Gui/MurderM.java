@@ -3,9 +3,9 @@ package Gui;
 import Cards.Card;
 import Cards.EstateCard;
 import Cells.Cell;
-import Cells.FreeCell;
 import Main.Game;
 import Objects.Board;
+import Objects.Player;
 
 import javax.swing.*;
 import javax.swing.border.Border;
@@ -20,10 +20,10 @@ import java.util.ArrayList;
 
 public class MurderM extends Subject implements WindowListener {
     private Game game = new Game(this);
-    private JFrame frame;
+    private final JFrame frame;
     private String[] names;
-    private Board board;
-    private BoardCanvas boardCanvas;
+    private final Board board;
+    private final BoardCanvas boardCanvas;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
 
@@ -34,7 +34,7 @@ public class MurderM extends Subject implements WindowListener {
         this.frame = new JFrame();
     }
 
-    public Board getBoard(){
+    public Board getBoard() {
         return board;
     }
 
@@ -54,20 +54,20 @@ public class MurderM extends Subject implements WindowListener {
 
         frame.setJMenuBar(addMenu());
         frame.getContentPane().add(createCanvas(), BorderLayout.CENTER);
-        frame.getContentPane().add(createButtons(),BorderLayout.PAGE_END);
+        frame.getContentPane().add(createButtons(), BorderLayout.PAGE_END);
         boardCanvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
 
-                int xClick = (int)Math.floor(e.getX() / 24.0);
-                int yClick = (int)Math.floor(e.getY() / 24.0) ;
+                int xClick = (int) Math.floor(e.getX() / 24.0);
+                int yClick = (int) Math.floor(e.getY() / 24.0);
 
                 if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
 
                     Cell selected = board.getCell(yClick, xClick);
 
-                    if(game.getCurrent()!= null && game.getCurrent().move(board, selected)){
+                    if (game.getCurrent() != null && game.getCurrent().move(board, selected)) {
                         notifyObservers();
                     }
                 }
@@ -78,11 +78,11 @@ public class MurderM extends Subject implements WindowListener {
 
         try {
             UIManager.setLookAndFeel(new NimbusLookAndFeel());
-            UIManager.put("control", new Color(58,58,59));
-            UIManager.put("info", new Color(58,58,59));
+            UIManager.put("control", new Color(58, 58, 59));
+            UIManager.put("info", new Color(58, 58, 59));
             UIManager.put("nimbusBase", new Color(28, 28, 30));
             UIManager.put("nimbusAlertYellow", new Color(248, 187, 0));
-            UIManager.put("nimbusDisabledText", new Color(58,58,59));
+            UIManager.put("nimbusDisabledText", new Color(58, 58, 59));
             UIManager.put("nimbusFocus", new Color(115, 164, 209));
             UIManager.put("nimbusGreen", new Color(176, 179, 50));
             UIManager.put("nimbusInfoBlue", new Color(66, 139, 221));
@@ -90,7 +90,7 @@ public class MurderM extends Subject implements WindowListener {
             UIManager.put("nimbusOrange", new Color(191, 98, 4));
             UIManager.put("nimbusRed", new Color(169, 46, 34));
             UIManager.put("nimbusSelectedText", new Color(255, 255, 255));
-            UIManager.put("nimbusSelectionBackground", new Color(72,72,74));
+            UIManager.put("nimbusSelectionBackground", new Color(72, 72, 74));
             UIManager.put("text", new Color(230, 230, 230));
             SwingUtilities.updateComponentTreeUI(frame);
         } catch (UnsupportedLookAndFeelException exc) {
@@ -99,9 +99,6 @@ public class MurderM extends Subject implements WindowListener {
 
         frame.setVisible(true);
     }
-
-
-
 
 
     public JMenuBar addMenu() {
@@ -149,8 +146,10 @@ public class MurderM extends Subject implements WindowListener {
         buttons.add(guess);
         buttons.add(finalGuess);
         buttons.add(endTurn);
+        roll.addActionListener(e -> game.roll());
         guess.addActionListener(e -> game.makeGuess());
         endTurn.addActionListener(e -> game.endTurn());
+        finalGuess.addActionListener(e -> game.finalGuess());
 
         //Text area for information
         JTextArea textDisplay = new JTextArea();
@@ -166,16 +165,19 @@ public class MurderM extends Subject implements WindowListener {
     }
 
 
-        public int displayOkOption(String message, String title){
+    public int displayOkOption(String message, String title) {
 
-            return JOptionPane.showConfirmDialog(frame,
-                    message,title ,
-                    JOptionPane.OK_CANCEL_OPTION);
-        }
+        return JOptionPane.showConfirmDialog(frame,
+                message, title,
+                JOptionPane.OK_CANCEL_OPTION);
+    }
+
+    public void displayMessage(String message) {
+        JOptionPane.showMessageDialog(frame, message);
+    }
 
 
-
-    public void displayPlayer(String playerName){
+    public void displayPlayer(String playerName) {
         JOptionPane.showMessageDialog(frame, "It is " + playerName + " turn please past them the tablet to them");
     }
 
@@ -183,47 +185,78 @@ public class MurderM extends Subject implements WindowListener {
     public ArrayList<Card> makeGuess(ArrayList<Card> tempDeck) {
         ArrayList<Card> toReturn = new ArrayList<>();
 
-            ArrayList<Card> buttons = new ArrayList<>();
+        ArrayList<Card> buttons = new ArrayList<>();
 
-            for (Card c : tempDeck) {
-                if (c instanceof EstateCard) {
-                    if (!c.getName().equals("Haunted House")) {
-                        continue;
-                    }
+        for (Card c : tempDeck) {
+            if (c instanceof EstateCard) {
+                if (!c.getName().equals(game.getCurrent().getEstateInString())) {
+                    continue;
                 }
-                buttons.add(c);
-
             }
-            GuessPanel jpane = new GuessPanel(buttons);
+            buttons.add(c);
+
+        }
+        GuessPanel jpane = new GuessPanel(buttons);
 
 
-            while (true) {
-                int result = JOptionPane.showConfirmDialog(null, jpane,
-                        "Please Select three cards", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE);
-                if (result == JOptionPane.OK_OPTION) {
+        while (true) {
+            int result = JOptionPane.showConfirmDialog(null, jpane,
+                    "Please Select three cards", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
 
-                    if (!jpane.cardCheck()) {
-                        JOptionPane.showMessageDialog(frame,
-                                "Select Three Cards",
-                                "Card Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        toReturn = jpane.selectedCards();
-                        break;
-                    }
-                } else if (result == JOptionPane.CANCEL_OPTION) {
+                if (!jpane.cardCheck()) {
+                    JOptionPane.showMessageDialog(frame,
+                            "Select Three Cards",
+                            "Card Error",
+                            JOptionPane.ERROR_MESSAGE);
+                } else {
+                    toReturn = jpane.selectedCards();
                     break;
                 }
+            } else if (result == JOptionPane.CANCEL_OPTION) {
+                break;
             }
-
+        }
 
 
         return toReturn;
     }
 
+    public Card refute(ArrayList<Card> guess, Player p) {
+        while (true) {
+            RefutePanel rP = new RefutePanel(p.getHand());
+            int result = JOptionPane.showConfirmDialog(null, rP,
+                    "Its " + p.getName() + " turn to refute", JOptionPane.OK_CANCEL_OPTION,
+                    JOptionPane.PLAIN_MESSAGE);
+            if (result == JOptionPane.OK_OPTION) {
+                Card c = rP.cardSelected();
+                if (c == null) {
+                    boolean canRefute = game.checkRefute(guess, p.getHand());
+                    if (canRefute) {
+                        JOptionPane.showMessageDialog(frame, "You can refute");
+                    } else {
+                        return null;
+                    }
+                } else {
+                    boolean isRefute = game.isARefute(guess, c);
+                    if (isRefute) {
+                        return c;
 
-    public void errorMessage(String message, String title){
+                    } else {
+                        JOptionPane.showMessageDialog(frame, "That's not a refute");
+                    }
+                }
+
+            } else if (result == JOptionPane.CANCEL_OPTION) {
+                this.errorMessage("Please enter a refute", "Select Refute");
+            }
+        }
+
+    }
+
+
+    public void errorMessage(String message, String title) {
         JOptionPane.showMessageDialog(frame,
                 message,
                 title,
@@ -270,7 +303,6 @@ public class MurderM extends Subject implements WindowListener {
         JC.addTextField(player1Name);
         JC.addTextField(player2Name);
         JC.addTextField(player3Name);
-
 
 
         dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
@@ -324,8 +356,8 @@ public class MurderM extends Subject implements WindowListener {
 
     @Override
     public void windowClosing(WindowEvent e) {
-        int result = this.displayOkOption("Do you want to Exit?","Exit Confirmation");
-        if (result ==  0) {
+        int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
+        if (result == 0) {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         } else if (result == 2) {
             frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -357,7 +389,7 @@ public class MurderM extends Subject implements WindowListener {
 
     }
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
         Board board = new Board(24, 24);
         board.setup();
 

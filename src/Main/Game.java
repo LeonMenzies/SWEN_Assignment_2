@@ -1,29 +1,23 @@
 package Main;
 
-import Cells.*;
-import Cards.*;
-import Gui.*;
-import Objects.*;
+import Cards.Card;
+import Cards.CharacterCard;
+import Cards.EstateCard;
+import Cards.WeaponCard;
+import Gui.MurderM;
+import Objects.Board;
+import Objects.Estate;
+import Objects.Player;
+import Objects.Weapon;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.MenuKeyEvent;
-import javax.swing.event.MenuKeyListener;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import javax.swing.text.DefaultCaret;
-import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class Game{
     ArrayList<Player> players = new ArrayList<>();
-    Queue<Integer> playerOrder = new ArrayDeque<Integer>();
+    Queue<Integer> playerOrder = new ArrayDeque<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
     ArrayList<Card> deck = new ArrayList<>();
     ArrayList<Card> tempDeck = new ArrayList<>();
@@ -34,25 +28,19 @@ public class Game{
     EstateCard where = null;
     WeaponCard what = null;
     boolean gameWon = false;
-    JButton guess;
-    JButton endTurn;
-    JButton roll;
-    JTextArea textDisplay;
-    JTextArea textArea;
-    int playerTurn;
+
+    int playerTurn = 0;
     private boolean gameStarted = false;
-    Player winner = null;
+    private boolean gameOver = false;
+
     Player currentPlayer = null;
-    private MurderM gui;
-    //Pattern MovePat = Pattern.compile("[RGHFWASDE]");
-    //Pattern dirPat = Pattern.compile("[WASD]");
+    private final MurderM gui;
 
 
 
     private final Board board;
 
-    private JFrame frame;
-    private static Game game;
+
 
 
     public Game(MurderM gui) {
@@ -69,13 +57,19 @@ public class Game{
 
 
     public void playGame(){
-        playerTurn = playerOrder.poll();
-        currentPlayer = players.get(playerTurn);
-        currentPlayer.setTurn(true);
-        currentPlayer.setRollStatus(false);
-        currentPlayer.setGuessStatus(false);
-
-        gui.displayPlayer(currentPlayer.getName());
+        if(!gameWon && !gameOver) {
+            playerTurn = playerOrder.poll();
+            currentPlayer = players.get(playerTurn);
+            currentPlayer.setTurn(true);
+            gui.notifyObservers();
+            currentPlayer.setRollStatus(false);
+            currentPlayer.setGuessStatus(false);
+            gui.displayPlayer(currentPlayer.getName());
+        }else if(gameWon && !gameOver){
+            gui.displayOkOption(currentPlayer.getName() + " has won!", "Winner");
+        }else if(!gameWon){
+            gui.displayOkOption("No one can guess game is over", "Game Over");
+        }
     }
 
     public void setGameStarted(boolean b){
@@ -107,7 +101,6 @@ public class Game{
 
     public void endTurn(){
 
-
         if(gameStarted) {
             int result = gui.displayOkOption("Are you sure want to end your turn?", "End Turn");
             if(result == 0) {
@@ -125,20 +118,39 @@ public class Game{
         }
     }
 
+    public void roll(){
+        if(gameStarted) {
+            if (!currentPlayer.getRollStatus()) {
+                currentPlayer.roll();
+                currentPlayer.setRollStatus(true);
+            } else {
+                gui.errorMessage("You have already rolled", "Roll Error");
+            }
+        }
+
+    }
+    public boolean checkGameOver(){
+        int count = 0;
+        for(Player p : players){
+            if(p.getIsOut()){
+                count++;
+            }
+        }
+        return players.size() == count;
+    }
+
     public void makeGuess() {
         if(gameStarted) {
             guessDeck.clear();
             refuteCards.clear();
-            if (!currentPlayer.getGuessStatus()) {
+            if (!currentPlayer.getGuessStatus() && !currentPlayer.getEstateInString().equals("null")) {
                 guessDeck = gui.makeGuess(tempDeck);
                 if (guessDeck.size() > 0) {
-                    for (Card c : guessDeck) {
-                        System.out.println(c.getName());
-                    }
                     currentPlayer.setGuessStatus(true);
+                    refute(guessDeck);
+
                 }
 
-                // refute(guessDeck);
             } else {
                 gui.errorMessage("You have already made a guess or need to be in an estate", "Guess Error");
             }
@@ -146,42 +158,41 @@ public class Game{
 
     }
 
-    public void refute(List<Card> guess) {
+    public void finalGuess(){
+        if(gameStarted){
+            guessDeck.clear();
+            if(!currentPlayer.getGuessStatus()){
+                guessDeck = gui.makeGuess(tempDeck);
+                if(guessDeck.size() > 0){
+                   gameWon = checkWin(guessDeck);
+                   if(gameWon){
+                       playGame();
+                   }else{
+                       gui.displayMessage(currentPlayer.getName() + " you are out you can still refute");
+                       currentPlayer.setIsout(true);
+                       gameOver = checkGameOver();
+                       if(gameOver){
+                           playGame();
+                       }
+                   }
+
+                }
+            }else{
+                gui.errorMessage("You have already made a guess", "Guess Error");
+            }
+
+        }
+    }
+
+    public void refute(ArrayList<Card> guess) {
         refuteOrder(currentPlayer);
         //display guess
 
         for (Player p : tempPlayers) {
-            while (true) {
-                RefutePanel rP = new RefutePanel(p.getHand());
-                int result = JOptionPane.showConfirmDialog(null, rP,
-                        "Its " + p.getName() + " turn to refute", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE);
-                if (result == JOptionPane.OK_OPTION) {
-                    Card c = rP.cardSelected();
-                    if (c == null) {
-                        boolean canRefute = checkRefute(guess, p.getHand());
-                        if (canRefute) {
-                            JOptionPane.showMessageDialog(frame, "You can refute");
-                        } else {
-                            break;
-                        }
-                    } else {
-                        boolean isRefute = isARefute(guess, c);
-                        if (isRefute) {
-                            refuteCards.add(c);
-                            break;
-                        } else {
-                            JOptionPane.showMessageDialog(frame, "That's not a refute");
-                        }
-                    }
-
-                } else if (result == JOptionPane.CANCEL_OPTION) {
-                    JOptionPane.showMessageDialog(frame,
-                            "Please enter a refute",
-                            "Select Refute",
-                            JOptionPane.ERROR_MESSAGE);
-                }
-            }
+          Card c = gui.refute(guess,p);
+          if(c != null){
+              refuteCards.add(c);
+          }
         }
 
     }
@@ -506,9 +517,6 @@ public class Game{
         }
     }
 
-    /**
-     * Clears the console screen so other players can't see what the other players have done
-     */
 
 
 
