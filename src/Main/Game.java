@@ -45,7 +45,6 @@ public class Game{
 
     public Game(MurderM gui) {
         this.board = gui.getBoard();
-
         this.gui = gui;
     }
 
@@ -53,6 +52,9 @@ public class Game{
         return currentPlayer;
     }
 
+    public boolean getGameStatus(){
+        return !gameOver && !gameWon;
+    }
 
 
 
@@ -104,7 +106,7 @@ public class Game{
 
     public void endTurn(){
 
-        if(gameStarted) {
+        if(gameStarted && !gameWon && !gameOver) {
             int result = gui.displayOkOption("Are you sure want to end your turn?", "End Turn");
             if(result == 0) {
                 if(currentPlayer.getSteps() == 0 || !currentPlayer.getEstateInString().equals("null")) {
@@ -122,7 +124,7 @@ public class Game{
     }
 
     public void roll(){
-        if(gameStarted) {
+        if(gameStarted && !gameWon && !gameOver) {
             if (!currentPlayer.getRollStatus()) {
                 currentPlayer.roll();
                 currentPlayer.setRollStatus(true);
@@ -143,7 +145,7 @@ public class Game{
     }
 
     public void makeGuess() {
-        if(gameStarted) {
+        if(gameStarted && !gameWon && !gameOver) {
             guessDeck.clear();
             refuteCards.clear();
             if (!currentPlayer.getGuessStatus() && !currentPlayer.getEstateInString().equals("null")) {
@@ -162,7 +164,7 @@ public class Game{
     }
 
     public void finalGuess(){
-        if(gameStarted){
+        if(gameStarted && !gameWon && !gameOver){
             guessDeck.clear();
             if(!currentPlayer.getGuessStatus()){
                 guessDeck = gui.makeGuess(tempDeck);
@@ -171,12 +173,12 @@ public class Game{
                    if(gameWon){
                        playGame();
                    }else{
-                       gui.displayMessage(currentPlayer.getName() + " you are out you can still refute");
                        currentPlayer.setIsout(true);
                        gameOver = checkGameOver();
                        if(gameOver){
                            playGame();
                        }
+                       gui.displayMessage(currentPlayer.getName() + " you are out you can still refute");
                    }
 
                 }
@@ -252,53 +254,6 @@ public class Game{
     public void moveCharacters(Player player, WeaponCard gWhat, CharacterCard gWho) {
 
 
-        Player pl;
-        Estate we;
-        Estate e = player.getEstateIn();
-
-        //Goes through the list of weapons finds the one that match's that of the guess removes it from its current estate into the new one
-        for (Weapon w1 : board.getWeapons()) {
-            if (w1.getWepName().equals(gWhat.getName())) {
-
-                we = w1.getEstate();
-                if (!we.getEstateName().equals(e.getEstateName())) {
-                    we.removeWeaponInEstate(w1);
-                    e.addWeaponInEstate(w1);
-                }
-            }
-        }
-
-
-        //goes through the list of players finding the one that match's the guess if they are already in an estate removes from that estate and into the new one
-        //if they are somewhere on the board goes through the board and replaces them with a free cell
-        for (Player p1 : players) {
-            if (p1.getName().equals(gWho.getName())) {
-                pl = p1;
-
-                if (pl.getEstateIn() != null) {
-
-                    Estate es = pl.getEstateIn();
-                    if (!es.getEstateName().equals(e.getEstateName())) {
-                        es.removePlayersInEstate(pl);
-                        e.addPlayersInEstate(pl);
-                    }
-
-                } else {
-                    for (int i = 0; i < board.getCells().length; i++) {
-                        for (int j = 0; j < board.getCells().length; j++) {
-//                            if (board.getCell(i, j) instanceof PlayerCell) {
-//                                PlayerCell pc = (PlayerCell) board.getCell(i, j);
-//                                if (pc.toString().equals(pl.toString())) {
-//                                    board.redrawCell(i, j, new FreeCell(i, j, board.getCellImages().get("__")));
-//                                }
-//                            }
-                        }
-                    }
-                    e.addPlayersInEstate(pl);
-                }
-
-            }
-        }
     }
 
     /**
@@ -393,6 +348,9 @@ public class Game{
         playerSetUp(playerSize);
         setUpDeck();
         generateMurder();
+        for(Card c : circumstance){
+            System.out.println(c.getName());
+        }
         dealCards();
         Random rand = new Random();
         int i = rand.nextInt(players.size());

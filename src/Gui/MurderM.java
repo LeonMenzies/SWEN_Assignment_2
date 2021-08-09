@@ -72,7 +72,7 @@ public class MurderM extends Subject implements WindowListener {
 
                     Cell selected = board.getCell(yClick, xClick);
 
-                    if (game.getCurrent() != null ) {
+                    if (game.getCurrent() != null && game.getGameStatus() ) {
                         if(game.getCurrent().getSteps() != 0) {
                             if (game.getCurrent().move(board, selected)) {
                                 notifyObservers();
