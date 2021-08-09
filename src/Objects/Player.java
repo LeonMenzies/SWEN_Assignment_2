@@ -19,6 +19,8 @@ public class Player extends Move implements Cloneable, Movable {
     private String name;
     private int row;
     private int col;
+    private int d1;
+    private int d2;
     private Random dice1 = new Random();
     private Random dice2 = new Random();
     private final int UPPERBOUND = 6;
@@ -27,6 +29,7 @@ public class Player extends Move implements Cloneable, Movable {
     private boolean isOut = false;
     private boolean hasWon = false;
     private boolean hasGuessed = false;
+    private String actualName;
 
     private Image cellImage;
 
@@ -34,7 +37,7 @@ public class Player extends Move implements Cloneable, Movable {
     private List<Card> hand;
     private List<Cell> visited;
 
-    public Player(String name, int row, int col, Image cellImage) {
+    public Player(String name, int row, int col, Image cellImage, String actualName) {
         super(row, col);
         this.cellImage = cellImage;
         this.name = name;
@@ -43,6 +46,7 @@ public class Player extends Move implements Cloneable, Movable {
         hand = new ArrayList<>();
         guesses = new ArrayList<>();
         this.visited = new ArrayList<>();
+        this.actualName = actualName;
     }
 
     /**
@@ -50,12 +54,23 @@ public class Player extends Move implements Cloneable, Movable {
      */
     public void roll() {
         if (turn) {
-            int d1 = dice1.nextInt(UPPERBOUND) + 1;
-            int d2 = dice2.nextInt(UPPERBOUND) + 1;
-            System.out.println("You rolled a " + d1 + " and a " + d2);
+             d1 = dice1.nextInt(UPPERBOUND) + 1;
+             d2 = dice2.nextInt(UPPERBOUND) + 1;
             steps = d1 + d2;
 
         }
+    }
+
+    public int getD1(){
+        return d1;
+    }
+
+    public int getD2(){
+        return d2;
+    }
+
+    public String getActualName(){
+        return  actualName;
     }
 
     /**
@@ -85,7 +100,7 @@ public class Player extends Move implements Cloneable, Movable {
      */
     @Override
     public Player clone() {
-        Player p = new Player(this.name, this.row, this.col, this.cellImage);
+        Player p = new Player(this.name, this.row, this.col, this.cellImage,this.actualName);
         for (Card c : this.hand) {
             p.hand.add(c.clone());
         }

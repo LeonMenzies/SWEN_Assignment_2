@@ -17,6 +17,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MurderM extends Subject implements WindowListener {
 
@@ -25,9 +26,12 @@ public class MurderM extends Subject implements WindowListener {
     private String[] names;
     private final Board board;
     private final BoardCanvas boardCanvas;
-    JTextArea handDisplay;
-    JTextArea guessDisplay;
-    JTextArea refuteDisplay;
+    private final ArrayList<JTextField> nameInfo = new ArrayList<>();
+    JLabel handDisplay;
+    JLabel guessDisplay;
+    JLabel refuteDisplay;
+    JLabel stepDisplay;
+    private JLabel currentPlayer;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
 
@@ -44,11 +48,11 @@ public class MurderM extends Subject implements WindowListener {
 
     public void setUp() {
         setUpPlayerNames();
-        if(names != null) {
+        if (names != null) {
             this.game = new Game(this);
             game.setGameStarted(true);
 
-            game.setUp(names.length);
+            game.setUp(names);
             notifyObservers();
             game.playGame();
         }
@@ -75,18 +79,20 @@ public class MurderM extends Subject implements WindowListener {
 
                     Cell selected = board.getCell(yClick, xClick);
 
-                    if (game.getCurrent() != null && game.getGameStatus() ) {
-                        if(game.getCurrent().getSteps() != 0) {
+                    if (game.getCurrent() != null && game.getGameStatus()) {
+                        if (game.getCurrent().getSteps() != 0) {
                             if (game.getCurrent().move(board, selected)) {
+                                displaySteps();
                                 notifyObservers();
                             }
-                        }else{
-                            errorMessage("You are out of steps or need to roll!", "Invalid Move");
                         }
                     }
                 }
             }
         });
+
+
+        frame.getContentPane().add(createDisplay(), BorderLayout.LINE_END);
         frame.addWindowListener(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -114,6 +120,51 @@ public class MurderM extends Subject implements WindowListener {
         frame.setVisible(true);
     }
 
+    public JPanel createDisplay() {
+
+        this.currentPlayer = new JLabel("", SwingConstants.LEFT);
+        this.currentPlayer.setPreferredSize(new Dimension(210, 5));
+        this.currentPlayer.setVerticalAlignment(SwingConstants.CENTER);
+        this.currentPlayer.setBorder(BorderFactory.createLineBorder(Color.white));
+
+        this.stepDisplay = new JLabel("", SwingConstants.LEFT);
+        this.stepDisplay.setPreferredSize(new Dimension(210, 5));
+        this.stepDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.stepDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
+
+        this.handDisplay = new JLabel("", SwingConstants.LEFT);
+        this.handDisplay.setPreferredSize(new Dimension(210, 5));
+        this.handDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.handDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
+
+        this.guessDisplay = new JLabel("", SwingConstants.LEFT);
+        this.guessDisplay.setPreferredSize(new Dimension(210, 5));
+        this.guessDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.guessDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
+
+        this.refuteDisplay = new JLabel("", SwingConstants.LEFT);
+        this.refuteDisplay.setPreferredSize(new Dimension(210, 5));
+        this.refuteDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.refuteDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
+
+
+        JPanel playerInfo = new JPanel(new GridLayout(5, 1));
+        playerInfo.add(currentPlayer);
+        playerInfo.add(stepDisplay);
+        playerInfo.add(handDisplay);
+        playerInfo.add(guessDisplay);
+        playerInfo.add(refuteDisplay);
+
+        return playerInfo;
+    }
+
+    public void resetDisplay(){
+        this.currentPlayer.setText("");
+        this.stepDisplay.setText("");
+        this.handDisplay.setText("");
+        this.guessDisplay.setText("");
+        this.refuteDisplay.setText("");
+    }
 
     public JMenuBar addMenu() {
 
@@ -130,12 +181,74 @@ public class MurderM extends Subject implements WindowListener {
         options.add(i1);
         i1.addActionListener(e -> this.setUp());
         i2.addActionListener(e -> this.restart());
-        i3.addActionListener(e->quit());
+        i3.addActionListener(e -> quit());
         options.add(i2);
         options.add(i3);
         menu.add(options);
         return menu;
     }
+
+    public void setCurrentPlayer(String actualName, String characterName) {
+
+        currentPlayer.setText("Its currently " + actualName + "s (" + characterName + ")" + " turn");
+
+    }
+
+    public void displaySteps() {
+        if (!game.getCurrent().getRollStatus()) {
+            stepDisplay.setText("Please roll too get your steps");
+        } else if (game.getCurrent().getSteps() == 0) {
+            stepDisplay.setText("You are out of steps!");
+        } else {
+            String sb = "<html>You rolled a " + game.getCurrent().getD1() + " and a " + game.getCurrent().getD2() + "<br/>" +
+                    "You currently have " + game.getCurrent().getSteps() + " steps left" + "</html>";
+            stepDisplay.setText(sb);
+
+        }
+
+    }
+
+    public void setHandDisplay(Boolean b) {
+        handDisplay.setVisible(b);
+    }
+
+    public void displayHand(List<Card> hand) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<html> Your current hand is: <br/>");
+        for (int i = 0; i < hand.size(); i++) {
+            sb.append(i).append(":").append(hand.get(i).getName()).append("<br/>");
+        }
+        sb.append("</html>");
+        handDisplay.setText(sb.toString());
+
+
+    }
+
+    public void displayGuess(List<Card> guess) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<html> The current guess by ").append(game.getCurrent().getActualName()).append(" is: <br/>");
+        for (int i = 0; i < guess.size(); i++) {
+            sb.append(i).append(":").append(guess.get(i).getName()).append("<br/>");
+        }
+        sb.append("</html>");
+        guessDisplay.setText(sb.toString());
+
+    }
+
+    public void displayRefute(List<Card> refute) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("<html>Refute for your guess is: <br/>");
+        for (int i = 0; i < refute.size(); i++) {
+            sb.append(i).append(":").append(refute.get(i).getName()).append("<br/>");
+        }
+        sb.append("</html>");
+        refuteDisplay.setText(sb.toString());
+
+    }
+
 
     public JPanel createCanvas() {
 
@@ -170,24 +283,14 @@ public class MurderM extends Subject implements WindowListener {
         //Text area for information
         JTextArea textDisplay = new JTextArea(5, 10);
         textDisplay.setEditable(false);
-        JScrollPane scroll = new JScrollPane (textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        DefaultCaret caret = (DefaultCaret)textDisplay.getCaret();
+        JScrollPane scroll = new JScrollPane(textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        DefaultCaret caret = (DefaultCaret) textDisplay.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
         controls.add(scroll);
         controls.add(buttons);
 
-        JPanel playerInfo = new JPanel(new GridLayout(3,0));
-        handDisplay = new JTextArea(6, 18);
-        guessDisplay = new JTextArea(6, 18);
-        refuteDisplay = new JTextArea(6, 18);
-
-        playerInfo.add(handDisplay);
-        playerInfo.add(guessDisplay);
-        playerInfo.add(refuteDisplay);
-
-        frame.add(playerInfo, BorderLayout.LINE_END);
 
         return controls;
     }
@@ -206,7 +309,7 @@ public class MurderM extends Subject implements WindowListener {
 
 
     public void displayPlayer(String playerName) {
-        JOptionPane.showMessageDialog(frame, "It is " + playerName + " turn please past them the tablet to them");
+        JOptionPane.showMessageDialog(frame, "It is " + playerName + "s turn please past them the tablet to them");
     }
 
 
@@ -291,7 +394,7 @@ public class MurderM extends Subject implements WindowListener {
                 JOptionPane.ERROR_MESSAGE);
     }
 
-    public void setUpPlayerNames(){
+    public void setUpPlayerNames() {
         Object[] options = {"3",
                 "4"};
         int n = JOptionPane.showOptionDialog(frame,
@@ -309,7 +412,7 @@ public class MurderM extends Subject implements WindowListener {
             names = new String[4];
         }
 
-        if(names !=  null) {
+        if (names != null) {
             JPanel dialogPanel = new JPanel(new GridBagLayout());
 
             Border titleBorder = BorderFactory.createTitledBorder("Player Information");
@@ -319,6 +422,9 @@ public class MurderM extends Subject implements WindowListener {
             JTextField player1Name = new JTextField(5);
             JTextField player2Name = new JTextField(5);
             JTextField player3Name = new JTextField(5);
+            nameInfo.add(player1Name);
+            nameInfo.add(player2Name);
+            nameInfo.add(player3Name);
 
             player1Name.setText("Harry");
             player2Name.setText("Leon");
@@ -339,6 +445,7 @@ public class MurderM extends Subject implements WindowListener {
             dialogPanel.add(player3Name, createGbc(1, 2));
             if (names.length == 4) {
                 JTextField player4Name = new JTextField(5);
+                nameInfo.add(player4Name);
                 JC.addTextField(player4Name);
                 dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
                 dialogPanel.add(player4Name, createGbc(1, 3));
@@ -360,10 +467,14 @@ public class MurderM extends Subject implements WindowListener {
                     }
                 }
             }
+            for (int i = 0; i < names.length; i++) {
+                names[i] = nameInfo.get(i).getText();
+            }
+
         }
     }
 
-    public void restart(){
+    public void restart() {
         frame.dispose();
         Board board = new Board(24, 24);
         board.setup();
@@ -374,10 +485,10 @@ public class MurderM extends Subject implements WindowListener {
         m.guiSetup();
     }
 
-    public void quit(){
+    public void quit() {
         int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
         if (result == 0) {
-           System.exit(0);
+            System.exit(0);
         } else if (result == 2) {
             frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
         }
@@ -386,7 +497,7 @@ public class MurderM extends Subject implements WindowListener {
 
     @Override
     public void windowOpened(WindowEvent e) {
-      this.displayMessage("Welcome to Murder Mystery!");
+        this.displayMessage("Welcome to Murder Mystery!");
     }
 
     private static GridBagConstraints createGbc(int x, int y) {
@@ -409,7 +520,7 @@ public class MurderM extends Subject implements WindowListener {
 
     @Override
     public void windowClosing(WindowEvent e) {
-       quit();
+        quit();
     }
 
     @Override

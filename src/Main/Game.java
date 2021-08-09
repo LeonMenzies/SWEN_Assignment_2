@@ -11,20 +11,14 @@ import Objects.Player;
 import Objects.Weapon;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.border.Border;
-import javax.swing.event.MenuKeyEvent;
-import javax.swing.event.MenuKeyListener;
-import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import javax.swing.text.DefaultCaret;
-import java.awt.*;
-import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.List;
 
-public class Game {
+public class Game{
+    ArrayList<Weapon> wpList = new ArrayList<>();
+
     ArrayList<Player> players = new ArrayList<>();
     Queue<Integer> playerOrder = new ArrayDeque<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
@@ -37,12 +31,6 @@ public class Game {
     EstateCard where = null;
     WeaponCard what = null;
     boolean gameWon = false;
-    JButton guess;
-    JButton endTurn;
-    JButton roll;
-    JTextArea textDisplay;
-    JTextArea textArea;
-    Player winner = null;
 
     int playerTurn = 0;
     private boolean gameStarted = false;
@@ -51,7 +39,12 @@ public class Game {
     Player currentPlayer = null;
     private final MurderM gui;
 
+
+
     private final Board board;
+
+
+
 
     public Game(MurderM gui) {
         this.board = gui.getBoard();
@@ -78,10 +71,13 @@ public class Game {
                 gui.notifyObservers();
                 currentPlayer.setRollStatus(false);
                 currentPlayer.setGuessStatus(false);
-                gui.displayPlayer(currentPlayer.getName());
+                gui.displaySteps();
+                gui.setCurrentPlayer(currentPlayer.getActualName(),currentPlayer.getName());
+                gui.displayHand(currentPlayer.getHand());
+                gui.displayPlayer(currentPlayer.getActualName());
             }
         }else if(gameWon && !gameOver){
-            gui.displayOkOption(currentPlayer.getName() + " has won!", "Winner");
+            gui.displayOkOption(currentPlayer.getActualName() + " has won!", "Winner");
         }else if(!gameWon){
             gui.displayOkOption("No one can guess game is over", "Game Over");
         }
@@ -124,6 +120,7 @@ public class Game {
                         currentPlayer.setTurn(false);
                         playerOrder.offer(playerTurn);
                     }
+                    gui.resetDisplay();
                     playGame();
                 }else{
                     gui.errorMessage("You must be out of steps or in an estate to end your turn", "End turn Error");
@@ -138,6 +135,8 @@ public class Game {
             if (!currentPlayer.getRollStatus()) {
                 currentPlayer.roll();
                 currentPlayer.setRollStatus(true);
+                gui.displaySteps();
+
             } else {
                 gui.errorMessage("You have already rolled", "Roll Error");
             }
@@ -161,7 +160,10 @@ public class Game {
             if (!currentPlayer.getGuessStatus() && !currentPlayer.getEstateInString().equals("null")) {
                 guessDeck = gui.makeGuess(tempDeck);
                 if (guessDeck.size() > 0) {
+                    moveCharacters();
                     currentPlayer.setGuessStatus(true);
+                    gui.setHandDisplay(false);
+                    gui.displayGuess(guessDeck);
                     refute(guessDeck);
 
                 }
@@ -188,7 +190,7 @@ public class Game {
                        if(gameOver){
                            playGame();
                        }
-                       gui.displayMessage(currentPlayer.getName() + " you are out you can still refute");
+                       gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
                    }
 
                 }
@@ -209,6 +211,9 @@ public class Game {
               refuteCards.add(c);
           }
         }
+        gui.displayOkOption("Please hand the tablet back to "+ currentPlayer.getActualName(), "Refute");
+        gui.displayRefute(refuteCards);
+        gui.setHandDisplay(true);
 
     }
 
@@ -256,15 +261,58 @@ public class Game {
     /**
      * Objects.Move the the weapon and player the on the board into the estate that the player is making the guess in
      *
-     * @param player player making the guess
-     * @param gWhat  current weapon card guess
-     * @param gWho   current player card guess
      */
 
-    public void moveCharacters(Player player, WeaponCard gWhat, CharacterCard gWho) {
+    public void moveCharacters() {
+        Card weaponC = null;
+        Card characterC = null;
+        for (Card c : guessDeck) {
+            if (c instanceof WeaponCard) {
+                weaponC = c;
+            }
+            if (c instanceof CharacterCard) {
+                characterC = c;
+            }
+        }
 
+        Player pl;
+        Estate we;
+        Estate e = currentPlayer.getEstateIn();
 
+        //Goes through the list of weapons finds the one that match's that of the guess removes it from its current estate into the new one
+        for (Weapon w1 : wpList) {
+            assert weaponC != null;
+            if (w1.getWepName().equals(weaponC.getName())) {
+
+                we = w1.getEstate();
+                if (!we.getEstateName().equals(e.getEstateName())) {
+                    we.removeWeaponInEstate(w1);
+                    e.addWeaponInEstate(w1);
+                }
+            }
+        }
+
+        for (Player p1 : players) {
+            assert characterC != null;
+            if (p1.getName().equals(characterC.getName())) {
+                pl = p1;
+
+                if (pl.getEstateIn() != null) {
+
+                    Estate es = pl.getEstateIn();
+                    if (!es.getEstateName().equals(e.getEstateName())) {
+                        es.removePlayersInEstate(pl);
+                        e.addPlayersInEstate(pl);
+                    }
+
+                }else{
+                    e.addPlayersInEstate(pl);
+                }
+            }
+        }
+        gui.notifyObservers();
     }
+
 
     /**
      * Make sure the order to refute is correct depending on who is making the guess
@@ -328,22 +376,22 @@ public class Game {
      * Method to set Up the right amount of players in the game either 3 or 4
      * Right amount of players are then added to the player Array for the game
      */
-    public void playerSetUp(int numPlayers) {
+    public void playerSetUp(String[] names) {
         //scans in a string from the console
 
 
         //players are then added to the array depending on the amount
-        players.add(new Player("Lucilla", 1, 11, board.getCellImages().get("Lucilla")));
-        players.add(new Player("Bert", 9, 1, board.getCellImages().get("Bert")));
-        players.add(new Player("Malina", 22, 9, board.getCellImages().get("Malina")));
+        players.add(new Player("Lucilla", 1, 11, board.getCellImages().get("Lucilla"),names[0]));
+        players.add(new Player("Bert", 9, 1, board.getCellImages().get("Bert"),names[1]));
+        players.add(new Player("Malina", 22, 9, board.getCellImages().get("Malina"),names[2]));
         playerOrder.add(0);
         playerOrder.add(1);
         playerOrder.add(2);
 
         //4 player gets added in if necessary
-        if (numPlayers == 4) {
+        if (names.length == 4) {
             playerOrder.add(3);
-            players.add(new Player("Percy", 14, 22, board.getCellImages().get("Percy")));
+            players.add(new Player("Percy", 14, 22, board.getCellImages().get("Percy"),names[3]));
         }
 
 
@@ -354,13 +402,11 @@ public class Game {
 
     }
 
-    public void setUp(int playerSize){
-        playerSetUp(playerSize);
+    public void setUp(String[] names){
+        playerSetUp(names);
         setUpDeck();
         generateMurder();
-        for(Card c : circumstance){
-            System.out.println(c.getName());
-        }
+       
         dealCards();
         Random rand = new Random();
         int i = rand.nextInt(players.size());
@@ -377,7 +423,7 @@ public class Game {
      */
 
     public void weaponSetup() {
-        ArrayList<Weapon> wpList = new ArrayList<>();
+
         try {
             wpList.add(new Weapon("Broom", 0, 0, null, ImageIO.read(new File("src/resources/weapon_broom.png"))));
             wpList.add(new Weapon("Scissors", 0, 0, null, ImageIO.read(new File("src/resources/weapon_scissors.png"))));
@@ -487,4 +533,8 @@ public class Game {
             }
         }
     }
+
+
+
+
 }
