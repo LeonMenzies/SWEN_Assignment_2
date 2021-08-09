@@ -25,6 +25,9 @@ public class MurderM extends Subject implements WindowListener {
     private String[] names;
     private final Board board;
     private final BoardCanvas boardCanvas;
+    JTextArea handDisplay;
+    JTextArea guessDisplay;
+    JTextArea refuteDisplay;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
 
@@ -53,7 +56,7 @@ public class MurderM extends Subject implements WindowListener {
 
     public void guiSetup() {
 
-        frame.setSize(576, 720);
+        frame.setSize(800, 800);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
 
@@ -165,14 +168,26 @@ public class MurderM extends Subject implements WindowListener {
         finalGuess.addActionListener(e -> game.finalGuess());
 
         //Text area for information
-        JTextArea textDisplay = new JTextArea();
+        JTextArea textDisplay = new JTextArea(5, 10);
         textDisplay.setEditable(false);
-        DefaultCaret caret = (DefaultCaret) textDisplay.getCaret();
+        JScrollPane scroll = new JScrollPane (textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        DefaultCaret caret = (DefaultCaret)textDisplay.getCaret();
         caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
 
 
-        controls.add(textDisplay);
+        controls.add(scroll);
         controls.add(buttons);
+
+        JPanel playerInfo = new JPanel(new GridLayout(3,0));
+        handDisplay = new JTextArea(6, 18);
+        guessDisplay = new JTextArea(6, 18);
+        refuteDisplay = new JTextArea(6, 18);
+
+        playerInfo.add(handDisplay);
+        playerInfo.add(guessDisplay);
+        playerInfo.add(refuteDisplay);
+
+        frame.add(playerInfo, BorderLayout.LINE_END);
 
         return controls;
     }

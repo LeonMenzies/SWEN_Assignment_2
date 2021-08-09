@@ -11,11 +11,20 @@ import Objects.Player;
 import Objects.Weapon;
 
 import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.swing.border.Border;
+import javax.swing.event.MenuKeyEvent;
+import javax.swing.event.MenuKeyListener;
+import javax.swing.plaf.nimbus.NimbusLookAndFeel;
+import javax.swing.text.DefaultCaret;
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.List;
 
-public class Game{
+public class Game {
     ArrayList<Player> players = new ArrayList<>();
     Queue<Integer> playerOrder = new ArrayDeque<>();
     ArrayList<Player> tempPlayers = new ArrayList<>();
@@ -28,6 +37,12 @@ public class Game{
     EstateCard where = null;
     WeaponCard what = null;
     boolean gameWon = false;
+    JButton guess;
+    JButton endTurn;
+    JButton roll;
+    JTextArea textDisplay;
+    JTextArea textArea;
+    Player winner = null;
 
     int playerTurn = 0;
     private boolean gameStarted = false;
@@ -36,12 +51,7 @@ public class Game{
     Player currentPlayer = null;
     private final MurderM gui;
 
-
-
     private final Board board;
-
-
-
 
     public Game(MurderM gui) {
         this.board = gui.getBoard();
@@ -477,8 +487,4 @@ public class Game{
             }
         }
     }
-
-
-
-
 }
