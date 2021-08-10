@@ -164,6 +164,7 @@ public class Player extends Move implements Cloneable, Movable {
         } else if ((selected instanceof EstateCell)) {
             EstateCell ec = (EstateCell) selected;
             if (ec.isDoor()) {
+                System.out.println(ec.getName());
                 estateIn = b.getEstate(ec.getName());
                 estateIn.addPlayersInEstate(this);
                 b.removePlayer(this);

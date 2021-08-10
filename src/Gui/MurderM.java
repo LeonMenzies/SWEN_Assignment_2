@@ -62,8 +62,7 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public void guiSetup() {
-
-        frame.setSize(800, 800);
+        frame.setSize(800, 700);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
 
@@ -270,7 +269,6 @@ public class MurderM extends Subject implements WindowListener {
 
 
     public JPanel createCanvas() {
-
         return boardCanvas;
     }
 
@@ -284,13 +282,11 @@ public class MurderM extends Subject implements WindowListener {
         buttons.setLayout(new FlowLayout());
 
         JButton roll = new JButton("Roll");
-        JButton showHand = new JButton("Show Hand");
         JButton guess = new JButton("Make Guess");
         JButton finalGuess = new JButton("Make Final Guess");
         JButton endTurn = new JButton("End Turn");
 
         buttons.add(roll);
-        buttons.add(showHand);
         buttons.add(guess);
         buttons.add(finalGuess);
         buttons.add(endTurn);
@@ -299,24 +295,13 @@ public class MurderM extends Subject implements WindowListener {
         endTurn.addActionListener(e -> game.endTurn());
         finalGuess.addActionListener(e -> game.finalGuess());
 
-        //Text area for information
-        JTextArea textDisplay = new JTextArea(5, 10);
-        textDisplay.setEditable(false);
-        JScrollPane scroll = new JScrollPane(textDisplay, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        DefaultCaret caret = (DefaultCaret) textDisplay.getCaret();
-        caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
-
-
-        controls.add(scroll);
         controls.add(buttons);
-
 
         return controls;
     }
 
 
     public int displayOkOption(String message, String title) {
-
         return JOptionPane.showConfirmDialog(frame,
                 message, title,
                 JOptionPane.OK_CANCEL_OPTION);

@@ -23,7 +23,6 @@ public class Estate {
 
 
     public Estate(String estateName, List<Integer> availableCells, int row, int col, Image estateImg) {
-        this.playersInEstate = new ArrayList<>();
         this.estateName = estateName;
         this.estateCellList = new ArrayList<>();
         this.exitCells = new ArrayList<>();
@@ -50,7 +49,6 @@ public class Estate {
      * @param b the board to redraw on
      */
     public void redrawEstate(Board b, Graphics g) {
-
         int SIZE = 24;
 
         for (Cell c : estateCellList) {
