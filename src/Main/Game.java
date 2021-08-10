@@ -11,6 +11,7 @@ import Objects.Player;
 import Objects.Weapon;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
@@ -378,12 +379,41 @@ public class Game{
      */
     public void playerSetUp(String[] names) {
         //scans in a string from the console
+        HashMap<String, Image> bert_directions = new HashMap<>();
+        HashMap<String, Image> lucilla_directions = new HashMap<>();
+        HashMap<String, Image> maline_directions = new HashMap<>();
+        HashMap<String, Image> percy_directions = new HashMap<>();
+
+        try {
+            bert_directions.put("up", ImageIO.read(new File("src/resources/player_be_up.png")));
+            bert_directions.put("down", ImageIO.read(new File("src/resources/player_be_down.png")));
+            bert_directions.put("left", ImageIO.read(new File("src/resources/player_be_left.png")));
+            bert_directions.put("right", ImageIO.read(new File("src/resources/player_be_right.png")));
+
+            lucilla_directions.put("up", ImageIO.read(new File("src/resources/player_lu_up.png")));
+            lucilla_directions.put("down", ImageIO.read(new File("src/resources/player_lu_down.png")));
+            lucilla_directions.put("left", ImageIO.read(new File("src/resources/player_lu_left.png")));
+            lucilla_directions.put("right", ImageIO.read(new File("src/resources/player_lu_right.png")));
+
+            maline_directions.put("up", ImageIO.read(new File("src/resources/player_ma_up.png")));
+            maline_directions.put("down", ImageIO.read(new File("src/resources/player_ma_down.png")));
+            maline_directions.put("left", ImageIO.read(new File("src/resources/player_ma_left.png")));
+            maline_directions.put("right", ImageIO.read(new File("src/resources/player_ma_right.png")));
+
+            percy_directions.put("up", ImageIO.read(new File("src/resources/player_pe_up.png")));
+            percy_directions.put("down", ImageIO.read(new File("src/resources/player_pe_down.png")));
+            percy_directions.put("left", ImageIO.read(new File("src/resources/player_pe_left.png")));
+            percy_directions.put("right", ImageIO.read(new File("src/resources/player_pe_right.png")));
+
+        }catch(IOException e){
+            System.out.println("Image not found");
+        }
 
 
         //players are then added to the array depending on the amount
-        players.add(new Player("Lucilla", 1, 11, board.getCellImages().get("Lucilla"),names[0]));
-        players.add(new Player("Bert", 9, 1, board.getCellImages().get("Bert"),names[1]));
-        players.add(new Player("Malina", 22, 9, board.getCellImages().get("Malina"),names[2]));
+        players.add(new Player("Lucilla", 1, 11, lucilla_directions, names[0], "down"));
+        players.add(new Player("Bert", 9, 1, bert_directions,names[1], "right"));
+        players.add(new Player("Malina", 22, 9, maline_directions,names[2], "up"));
         playerOrder.add(0);
         playerOrder.add(1);
         playerOrder.add(2);
@@ -391,7 +421,7 @@ public class Game{
         //4 player gets added in if necessary
         if (names.length == 4) {
             playerOrder.add(3);
-            players.add(new Player("Percy", 14, 22, board.getCellImages().get("Percy"),names[3]));
+            players.add(new Player("Percy", 14, 22, percy_directions,names[3], "left"));
         }
 
 
@@ -450,10 +480,10 @@ public class Game{
      */
     public void setUpDeck() {
         try {
-            this.deck.add(new CharacterCard("Bert", ImageIO.read(new File("src/resources/player_be.png"))));
-            this.deck.add(new CharacterCard("Percy", ImageIO.read(new File("src/resources/player_pe.png"))));
-            this.deck.add(new CharacterCard("Lucilla", ImageIO.read(new File("src/resources/player_lu.png"))));
-            this.deck.add(new CharacterCard("Malina", ImageIO.read(new File("src/resources/player_ma.png"))));
+            this.deck.add(new CharacterCard("Bert", ImageIO.read(new File("src/resources/player_be_right.png"))));
+            this.deck.add(new CharacterCard("Percy", ImageIO.read(new File("src/resources/player_pe_right.png"))));
+            this.deck.add(new CharacterCard("Lucilla", ImageIO.read(new File("src/resources/player_lu_right.png"))));
+            this.deck.add(new CharacterCard("Malina", ImageIO.read(new File("src/resources/player_ma_right.png"))));
             this.deck.add(new EstateCard("Haunted House", ImageIO.read(new File("src/resources/estate_haunted_house.png"))));
             this.deck.add(new EstateCard("Manic Manor", ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
             this.deck.add(new EstateCard("Villa Celia", ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
@@ -537,8 +567,4 @@ public class Game{
             }
         }
     }
-
-
-
-
 }

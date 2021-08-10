@@ -30,16 +30,18 @@ public class Player extends Move implements Cloneable, Movable {
     private boolean hasWon = false;
     private boolean hasGuessed = false;
     private String actualName;
+    private String direction;
 
-    private Image cellImage;
+    private HashMap<String, Image> playerImages;
 
     private ArrayList<Card> guesses;
     private List<Card> hand;
     private List<Cell> visited;
 
-    public Player(String name, int row, int col, Image cellImage, String actualName) {
+    public Player(String name, int row, int col, HashMap<String, Image> playerImages, String actualName, String defaultDirection) {
         super(row, col);
-        this.cellImage = cellImage;
+        this.playerImages = playerImages;
+        this.direction = defaultDirection;
         this.name = name;
         this.row = row;
         this.col = col;
@@ -54,44 +56,23 @@ public class Player extends Move implements Cloneable, Movable {
      */
     public void roll() {
         if (turn) {
-             d1 = dice1.nextInt(UPPERBOUND) + 1;
-             d2 = dice2.nextInt(UPPERBOUND) + 1;
+            d1 = dice1.nextInt(UPPERBOUND) + 1;
+            d2 = dice2.nextInt(UPPERBOUND) + 1;
             steps = d1 + d2;
-
         }
     }
 
-    public int getD1(){
+    public int getD1() {
         return d1;
     }
 
-    public int getD2(){
+    public int getD2() {
         return d2;
     }
 
-    public String getActualName(){
-        return  actualName;
+    public String getActualName() {
+        return actualName;
     }
-
-    /**
-     * Simple method for declaring this player object as the winner
-     *
-     * @param b boolean true or false if this player object has won
-     */
-    public void setHasWon(boolean b) {
-        hasWon = b;
-    }
-
-    /**
-     * Display the players hand to the system out
-     */
-    public void printHand() {
-        System.out.println(this.name + "'s" + " current Hand: ");
-        for (int i = 0; i < hand.size(); i++) {
-            System.out.println(i + ": " + hand.get(i).name);
-        }
-    }
-
 
     /**
      * Method for cloning the player
@@ -100,13 +81,12 @@ public class Player extends Move implements Cloneable, Movable {
      */
     @Override
     public Player clone() {
-        Player p = new Player(this.name, this.row, this.col, this.cellImage,this.actualName);
+        Player p = new Player(this.name, this.row, this.col, this.playerImages, this.actualName, this.direction);
         for (Card c : this.hand) {
             p.hand.add(c.clone());
         }
         return p;
     }
-
 
     /**
      * after checking the move is valid move the player on the given board
@@ -129,19 +109,30 @@ public class Player extends Move implements Cloneable, Movable {
                 visited.add(b.getCell(row, col));
                 steps--;
                 return true;
-
             }
         }
 
         //Move player
-         else if (isValid(b, selected)) {
+        else if (isValid(b, selected)) {
+
+            //Turn the player to the face the way they are going
+            if(row > selected.getRow()){
+                direction = "up";
+            } else if(row < selected.getRow()){
+                direction = "down";
+            } else if (col > selected.getCol()) {
+                direction = "left";
+            } else if(col < selected.getCol()){
+                direction = "right";
+            }
+
             this.row = selected.getRow();
             this.col = selected.getCol();
+
             visited.add(b.getCell(row, col));
             return true;
         }
         return false;
-
     }
 
     /**
@@ -160,11 +151,10 @@ public class Player extends Move implements Cloneable, Movable {
             }
             steps--;
             return true;
-        //Add player into the estate
+            //Add player into the estate
         } else if ((selected instanceof EstateCell)) {
             EstateCell ec = (EstateCell) selected;
             if (ec.isDoor()) {
-                System.out.println(ec.getName());
                 estateIn = b.getEstate(ec.getName());
                 estateIn.addPlayersInEstate(this);
                 b.removePlayer(this);
@@ -172,32 +162,7 @@ public class Player extends Move implements Cloneable, Movable {
                 return true;
             }
         }
-
         return false;
-
-    }
-
-    /**
-     * Adds a guess card to this player
-     *
-     * @param c the guess card to add
-     */
-    public void addGuess(Card c) {
-        this.guesses.add(c);
-    }
-
-    /**
-     * Clear the steps for this player
-     */
-    public void clearSteps() {
-        this.steps = 0;
-    }
-
-    /**
-     * Clear the guess cards for this player
-     */
-    public void clearGuess() {
-        this.guesses.clear();
     }
 
     /**
@@ -209,18 +174,9 @@ public class Player extends Move implements Cloneable, Movable {
         this.hand.add(card);
     }
 
-    /**
-     * Clear visited cells for when a player has finished there turn
-     */
-    public void clearVisited() {
-        visited.clear();
-    }
-
     /*
      * Getter and setters for this player object
      */
-
-
     public int getRow() {
         return row;
     }
@@ -237,16 +193,8 @@ public class Player extends Move implements Cloneable, Movable {
         return this.turn;
     }
 
-    public List<Card> getGuess() {
-        return this.guesses;
-    }
-
     public List<Card> getHand() {
         return this.hand;
-    }
-
-    public boolean getHasWon() {
-        return hasWon;
     }
 
     public String getName() {
@@ -286,7 +234,7 @@ public class Player extends Move implements Cloneable, Movable {
     }
 
     public Image getCellImage() {
-        return cellImage;
+        return playerImages.get(direction);
     }
 
     public boolean inEstate() {
@@ -310,6 +258,4 @@ public class Player extends Move implements Cloneable, Movable {
 
         return name.substring(0, 2);
     }
-
-
 }

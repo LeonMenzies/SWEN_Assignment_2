@@ -43,19 +43,12 @@ public class Estate {
         this.estateCellList.add(c);
     }
 
-    /**
-     * Redraw the estate on the board to update it when players enter or exit the estate
-     *
-     * @param b the board to redraw on
-     */
-    public void redrawEstate(Board b, Graphics g) {
+
+    public void redrawEstate(Graphics g) {
         int SIZE = 24;
 
-        for (Cell c : estateCellList) {
-            b.redrawCell(c.getRow(), c.getCol(), c);
-        }
 
-        g.drawImage(estateImg, row * SIZE, col * SIZE, estateImg.getWidth(null) / 2, estateImg.getHeight(null) / 2, null);
+        g.drawImage(estateImg, col * SIZE, row * SIZE, estateImg.getWidth(null) / 2, estateImg.getHeight(null) / 2, null);
 
 
         //Special method for picking the right location to redraw the players in the estate
@@ -64,7 +57,7 @@ public class Estate {
             int row = estateCellList.get(availableCells.get(i)).getRow();
             int col = estateCellList.get(availableCells.get(i)).getCol();
 
-            g.drawImage(objectsInEstate.get(i).getCellImage(), row * SIZE, col * SIZE, SIZE, SIZE, null);
+            g.drawImage(objectsInEstate.get(i).getCellImage(), col * SIZE, row * SIZE,  SIZE, SIZE, null);
         }
     }
 

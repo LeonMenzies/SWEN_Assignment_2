@@ -11,18 +11,14 @@ import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
-import javax.swing.text.DefaultCaret;
 import java.awt.*;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.WindowEvent;
-import java.awt.event.WindowListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MurderM extends Subject implements WindowListener {
+public class MurderM extends Subject implements WindowListener{
 
     private Game game = new Game(this);
     private final JFrame frame;
@@ -34,6 +30,7 @@ public class MurderM extends Subject implements WindowListener {
     JPanel guessDisplay;
     JPanel refuteDisplay;
     JLabel stepDisplay;
+    JMenuItem i1, i2, i3;
     private JLabel currentPlayer;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
     private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
@@ -45,6 +42,8 @@ public class MurderM extends Subject implements WindowListener {
         this.frame = new JFrame();
     }
 
+
+
     public Board getBoard() {
         return board;
     }
@@ -52,6 +51,7 @@ public class MurderM extends Subject implements WindowListener {
     public void setUp() {
         setUpPlayerNames();
         if (names != null) {
+            i1.setEnabled(false);
             this.game = new Game(this);
             game.setGameStarted(true);
 
@@ -177,7 +177,6 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public JMenuBar addMenu() {
-        JMenuItem i1, i2, i3;
 
         JMenuBar menu = new JMenuBar();
         JMenu options = new JMenu("Options");
@@ -281,24 +280,47 @@ public class MurderM extends Subject implements WindowListener {
         JPanel buttons = new JPanel();
         buttons.setLayout(new FlowLayout());
 
-        JButton roll = new JButton("Roll");
+        JButton roll = new JButton("Roll (R)");
         JButton guess = new JButton("Make Guess");
         JButton finalGuess = new JButton("Make Final Guess");
-        JButton endTurn = new JButton("End Turn");
+        JButton endTurn = new JButton("End Turn (E)");
 
         buttons.add(roll);
         buttons.add(guess);
         buttons.add(finalGuess);
         buttons.add(endTurn);
+
         roll.addActionListener(e -> game.roll());
         guess.addActionListener(e -> game.makeGuess());
         endTurn.addActionListener(e -> game.endTurn());
         finalGuess.addActionListener(e -> game.finalGuess());
-
         controls.add(buttons);
+
+        frame.addKeyListener(new KeyListener() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+
+            }
+
+            @Override
+            public void keyPressed(KeyEvent e) {
+                if(e.getKeyCode() == 69){
+                    game.endTurn();
+                } else if(e.getKeyCode() == 82){
+                    game.roll();
+                }
+            }
+
+            @Override
+            public void keyReleased(KeyEvent e) {
+            }
+        });
+
+        frame.setFocusable(true);
 
         return controls;
     }
+
 
 
     public int displayOkOption(String message, String title) {
@@ -480,6 +502,7 @@ public class MurderM extends Subject implements WindowListener {
 
     public void restart() {
         frame.dispose();
+        this.game.setGameStarted(false);
         setUpGame();
     }
 
@@ -548,10 +571,10 @@ public class MurderM extends Subject implements WindowListener {
 
     public static void main(String[] args) {
         setUpGame();
-
     }
 
     private static void setUpGame() {
+
         Board board = new Board(24, 24);
         board.setup();
         BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());

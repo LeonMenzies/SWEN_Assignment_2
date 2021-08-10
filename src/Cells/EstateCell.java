@@ -7,8 +7,8 @@ import java.awt.*;
  */
 public class EstateCell extends Cells.Cell {
 
-    private boolean isDoor;
-    private String nameFirst;
+    private final boolean isDoor;
+    private final String nameFirst;
     private String nameSecond;
 
 

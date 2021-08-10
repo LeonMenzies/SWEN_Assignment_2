@@ -60,10 +60,10 @@ public class Board {
         try {
 
             estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/estate_haunted_house.png"))));
-            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
+            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
             estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/estate_peril_palace.png"))));
-            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/estate_calamity_castle.png"))));
-            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 9, 10, ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
+            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/estate_calamity_castle.png"))));
+            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 10, 9, ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
         } catch (IOException e) {
             System.out.println("Image cannot be found");
         }
@@ -94,10 +94,11 @@ public class Board {
         try {
             cellImages.put("__", ImageIO.read(new File("src/resources/free_cell.png")));
             cellImages.put("GC", ImageIO.read(new File("src/resources/grey_cell.png")));
-            cellImages.put("Bert", ImageIO.read(new File("src/resources/player_be.png")));
-            cellImages.put("Lucilla", ImageIO.read(new File("src/resources/player_lu.png")));
-            cellImages.put("Percy", ImageIO.read(new File("src/resources/player_pe.png")));
-            cellImages.put("Malina", ImageIO.read(new File("src/resources/player_ma.png")));
+
+//            cellImages.put("Bert", ImageIO.read(new File("src/resources/player_be_right.png")));
+//            cellImages.put("Lucilla", ImageIO.read(new File("src/resources/player_lu_right.png")));
+//            cellImages.put("Percy", ImageIO.read(new File("src/resources/player_pe_right.png")));
+//            cellImages.put("Malina", ImageIO.read(new File("src/resources/player_ma_right.png")));
 
         } catch (IOException e) {
             System.out.println("Invalid cell image");
@@ -228,16 +229,6 @@ public class Board {
 
     }
 
-    /**
-     * Redraw a single cell at a given position
-     *
-     * @param row the row to be redrawn
-     * @param col the col to be redrawn
-     * @param c   the cell to to be drawn in that destination
-     */
-    public void redrawCell(int row, int col, Cell c) {
-        cells[row][col] = c;
-    }
 
     public Map<String, Image> getCellImages() {
         return cellImages;
@@ -286,9 +277,7 @@ public class Board {
 
             for (Cell c2 : c1) {
                 sb.append("|");
-                sb.append(String.valueOf(c2.getCol()));
-                sb.append(String.valueOf(c2.getRow()));
-                //sb.append(c2.toString());
+                sb.append(c2.toString());
             }
             sb.append("|");
             sb.append("\n");

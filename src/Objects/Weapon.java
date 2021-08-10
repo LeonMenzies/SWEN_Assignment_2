@@ -10,7 +10,7 @@ public class Weapon implements Movable{
 
     int row;
     int col;
-    private Image weaponImg;
+    private final Image weaponImg;
     private Estate estate;
 
     /**
@@ -28,10 +28,6 @@ public class Weapon implements Movable{
         this.weaponImg = wpImg;
     }
 
-    public Image getImg(){
-        return  this.weaponImg;
-    }
-
     /*
      * Getters and setters
      */
@@ -45,22 +41,6 @@ public class Weapon implements Movable{
 
     public String getWepName() {
         return wepName;
-    }
-
-    public int getRow(){
-        return this.row;
-    }
-
-    public int getCol(){
-        return this.col;
-    }
-
-    public void setRow(int r){
-        this.row = r;
-    }
-
-    public void setCol(int c){
-        this.col = c;
     }
 
     public Image getCellImage(){

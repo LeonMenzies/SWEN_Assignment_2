@@ -20,7 +20,7 @@ public class BoardCanvas extends JPanel implements Observer {
     List<Weapon> weapons;
     public final int SIZE = 24;
 
-    public BoardCanvas(Board board, Cell[][] cells, Map<String, Image> cellImages,List<Weapon> wp, Map<String, Estate> estates, List<Player> players){
+    public BoardCanvas(Board board, Cell[][] cells, Map<String, Image> cellImages, List<Weapon> wp, Map<String, Estate> estates, List<Player> players) {
         this.board = board;
         this.cells = cells;
         this.cellImages = cellImages;
@@ -31,6 +31,8 @@ public class BoardCanvas extends JPanel implements Observer {
 
     @Override
     public void paint(Graphics g) {
+
+
         //paint the cells on the board
         int xStep = 0;
         int yStep = 0;
@@ -46,25 +48,20 @@ public class BoardCanvas extends JPanel implements Observer {
 
         //paint the estates on the board
         for (Map.Entry<String, Estate> es : estates.entrySet()) {
-            es.getValue().redrawEstate(board, g);
+            es.getValue().redrawEstate(g);
         }
 
-        //paint the weapons
-        for(Weapon wp : weapons){
-            System.out.println(wp);
-            g.drawImage(wp.getCellImage(), wp.getCol() * SIZE, wp.getRow() * SIZE , SIZE, SIZE, null);
-        }
 
         //paint the players on the board
         for (Player p : players) {
+
             //Dont draw the player if in the estate
+            g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
 
-                g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
-
-                if (p.getTurn()) {
-                    g.setColor(new Color(200, 0, 0, 100));
-                    g.fillOval(p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE);
-                }
+            if (p.getTurn()) {
+                g.setColor(new Color(200, 0, 0, 100));
+                g.fillOval(p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE);
+            }
 
         }
     }
