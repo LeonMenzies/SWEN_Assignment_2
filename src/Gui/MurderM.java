@@ -137,14 +137,6 @@ public class MurderM extends Subject implements WindowListener {
         this.stepDisplay.setVerticalAlignment(JLabel.CENTER);
         this.stepDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
 
-        /*
-        this.handDisplay = new JLabel("", SwingConstants.LEFT);
-        this.handDisplay.setPreferredSize(new Dimension(210, 5));
-        this.handDisplay.setHorizontalAlignment(JLabel.LEFT);
-        this.handDisplay.setVerticalAlignment(JLabel.CENTER);
-        this.handDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
-        */
-
         this.handDisplay = new JPanel();
         this.handDisplay.setPreferredSize(new Dimension(210, 5));
         this.handDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
@@ -186,7 +178,6 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public JMenuBar addMenu() {
-
         JMenuItem i1, i2, i3;
 
         JMenuBar menu = new JMenuBar();
