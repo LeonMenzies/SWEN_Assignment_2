@@ -70,6 +70,7 @@ public class Game{
                 currentPlayer = players.get(playerTurn);
                 currentPlayer.setTurn(true);
                 gui.notifyObservers();
+                currentPlayer.clearVisted();
                 currentPlayer.setRollStatus(false);
                 currentPlayer.setGuessStatus(false);
                 gui.displaySteps();

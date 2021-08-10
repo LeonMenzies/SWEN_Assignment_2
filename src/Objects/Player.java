@@ -165,6 +165,10 @@ public class Player extends Move implements Cloneable, Movable {
         return false;
     }
 
+    public void clearVisted(){
+        visited.clear();
+    }
+
     /**
      * Add a card to this players hand
      *
