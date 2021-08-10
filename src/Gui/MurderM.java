@@ -157,6 +157,9 @@ public class MurderM extends Subject implements WindowListener{
 
         return playerInfo;
     }
+    /**
+     * Used to clear the panels to left of the board that hold the the players information
+     */
 
     public void resetDisplay(){
         this.currentPlayer.setText("");
@@ -176,6 +179,12 @@ public class MurderM extends Subject implements WindowListener{
         this.refuteDisplay.repaint();
     }
 
+    /**
+     * creates a Jmenu with start,restart and quit and adds action listeners to them
+     *
+     * @return a new Jmenu
+     */
+
     public JMenuBar addMenu() {
 
         JMenuBar menu = new JMenuBar();
@@ -183,6 +192,7 @@ public class MurderM extends Subject implements WindowListener{
 
         i1 = new JMenuItem("Start");
         i2 = new JMenuItem("Restart");
+        i2.setToolTipText("Restart the game");
         i3 = new JMenuItem("Quit");
 
 
@@ -289,6 +299,12 @@ public class MurderM extends Subject implements WindowListener{
         buttons.add(guess);
         buttons.add(finalGuess);
         buttons.add(endTurn);
+
+        roll.setToolTipText("Roll the dice to get your steps for this turn!");
+        guess.setToolTipText("Make a guess and other players will have a chance to refute!");
+        finalGuess.setToolTipText("Make a final accusation correct you win, fail you are out!");
+        endTurn.setToolTipText("End your turn :(");
+
 
         roll.addActionListener(e -> game.roll());
         guess.addActionListener(e -> game.makeGuess());
