@@ -208,8 +208,11 @@ public class MurderM extends Subject implements WindowListener {
         Image image = null;
         try { image = ImageIO.read(new File("src/resources/dice.png"));
         } catch (IOException e) { e.printStackTrace(); }
-        ImageIcon icon = new ImageIcon(image.getScaledInstance(48, 48, Image.SCALE_DEFAULT));
-        stepDisplay.setIcon(icon);
+        ImageIcon icon;
+        if(image != null) {
+            icon = new ImageIcon(image.getScaledInstance(48, 48, Image.SCALE_DEFAULT));
+            stepDisplay.setIcon(icon);
+        }
 
         if (!game.getCurrent().getRollStatus()) {
             stepDisplay.setText("<html> Please roll to get your steps </html>");
@@ -492,13 +495,7 @@ public class MurderM extends Subject implements WindowListener {
 
     public void restart() {
         frame.dispose();
-        Board board = new Board(24, 24);
-        board.setup();
-
-        BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
-        boardCanvas.setSize(576, 576);
-        MurderM m = new MurderM(board, boardCanvas);
-        m.guiSetup();
+        setUpGame();
     }
 
     public void quit() {
@@ -565,14 +562,17 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public static void main(String[] args) {
+        setUpGame();
+
+    }
+
+    private static void setUpGame() {
         Board board = new Board(24, 24);
         board.setup();
-
         BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
         boardCanvas.setSize(576, 576);
         MurderM m = new MurderM(board, boardCanvas);
         m.guiSetup();
-
     }
 }
 
