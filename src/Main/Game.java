@@ -449,20 +449,24 @@ public class Game{
      * shuffles the array after the cards have been added
      */
     public void setUpDeck() {
-        this.deck.add(new CharacterCard("Bert"));
-        this.deck.add(new CharacterCard("Percy"));
-        this.deck.add(new CharacterCard("Lucilla"));
-        this.deck.add(new CharacterCard("Malina"));
-        this.deck.add(new EstateCard("Haunted House"));
-        this.deck.add(new EstateCard("Manic Manor"));
-        this.deck.add(new EstateCard("Villa Celia"));
-        this.deck.add(new EstateCard("Calamity Castle"));
-        this.deck.add(new EstateCard("Peril Palace"));
-        this.deck.add(new WeaponCard("Broom"));
-        this.deck.add(new WeaponCard("Scissors"));
-        this.deck.add(new WeaponCard("Knife"));
-        this.deck.add(new WeaponCard("Shovel"));
-        this.deck.add(new WeaponCard("iPad"));
+        try {
+            this.deck.add(new CharacterCard("Bert", ImageIO.read(new File("src/resources/player_be.png"))));
+            this.deck.add(new CharacterCard("Percy", ImageIO.read(new File("src/resources/player_pe.png"))));
+            this.deck.add(new CharacterCard("Lucilla", ImageIO.read(new File("src/resources/player_lu.png"))));
+            this.deck.add(new CharacterCard("Malina", ImageIO.read(new File("src/resources/player_ma.png"))));
+            this.deck.add(new EstateCard("Haunted House", ImageIO.read(new File("src/resources/estate_haunted_house.png"))));
+            this.deck.add(new EstateCard("Manic Manor", ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
+            this.deck.add(new EstateCard("Villa Celia", ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
+            this.deck.add(new EstateCard("Calamity Castle", ImageIO.read(new File("src/resources/estate_calamity_castle.png"))));
+            this.deck.add(new EstateCard("Peril Palace", ImageIO.read(new File("src/resources/estate_peril_palace.png"))));
+            this.deck.add(new WeaponCard("Broom", ImageIO.read(new File("src/resources/weapon_broom.png"))));
+            this.deck.add(new WeaponCard("Scissors", ImageIO.read(new File("src/resources/weapon_scissors.png"))));
+            this.deck.add(new WeaponCard("Knife", ImageIO.read(new File("src/resources/weapon_knife.png"))));
+            this.deck.add(new WeaponCard("Shovel", ImageIO.read(new File("src/resources/weapon_shovel.png"))));
+            this.deck.add(new WeaponCard("iPad", ImageIO.read(new File("src/resources/weapon_ipad.png"))));
+        } catch (IOException e) {
+            System.out.println("Image not found");
+        }
 
         //clones the cards to a temp deck for making guesses
         for (Card c : deck) {

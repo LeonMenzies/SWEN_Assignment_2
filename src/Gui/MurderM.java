@@ -7,6 +7,7 @@ import Main.Game;
 import Objects.Board;
 import Objects.Player;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
@@ -16,6 +17,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,9 +30,9 @@ public class MurderM extends Subject implements WindowListener {
     private final Board board;
     private final BoardCanvas boardCanvas;
     private final ArrayList<JTextField> nameInfo = new ArrayList<>();
-    JLabel handDisplay;
-    JLabel guessDisplay;
-    JLabel refuteDisplay;
+    JPanel handDisplay;
+    JPanel guessDisplay;
+    JPanel refuteDisplay;
     JLabel stepDisplay;
     private JLabel currentPlayer;
     private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
@@ -122,31 +125,37 @@ public class MurderM extends Subject implements WindowListener {
 
     public JPanel createDisplay() {
 
-        this.currentPlayer = new JLabel("", SwingConstants.LEFT);
+        this.currentPlayer = new JLabel("", JLabel.CENTER);
         this.currentPlayer.setPreferredSize(new Dimension(210, 5));
-        this.currentPlayer.setVerticalAlignment(SwingConstants.CENTER);
+        this.currentPlayer.setHorizontalAlignment(JLabel.LEFT);
+        this.currentPlayer.setVerticalAlignment(JLabel.CENTER);
         this.currentPlayer.setBorder(BorderFactory.createLineBorder(Color.white));
 
         this.stepDisplay = new JLabel("", SwingConstants.LEFT);
         this.stepDisplay.setPreferredSize(new Dimension(210, 5));
-        this.stepDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.stepDisplay.setHorizontalAlignment(JLabel.LEFT);
+        this.stepDisplay.setVerticalAlignment(JLabel.CENTER);
         this.stepDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
 
+        /*
         this.handDisplay = new JLabel("", SwingConstants.LEFT);
         this.handDisplay.setPreferredSize(new Dimension(210, 5));
-        this.handDisplay.setVerticalAlignment(SwingConstants.CENTER);
+        this.handDisplay.setHorizontalAlignment(JLabel.LEFT);
+        this.handDisplay.setVerticalAlignment(JLabel.CENTER);
+        this.handDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
+        */
+
+        this.handDisplay = new JPanel();
+        this.handDisplay.setPreferredSize(new Dimension(210, 5));
         this.handDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
 
-        this.guessDisplay = new JLabel("", SwingConstants.LEFT);
+        this.guessDisplay = new JPanel();
         this.guessDisplay.setPreferredSize(new Dimension(210, 5));
-        this.guessDisplay.setVerticalAlignment(SwingConstants.CENTER);
         this.guessDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
 
-        this.refuteDisplay = new JLabel("", SwingConstants.LEFT);
+        this.refuteDisplay = new JPanel();
         this.refuteDisplay.setPreferredSize(new Dimension(210, 5));
-        this.refuteDisplay.setVerticalAlignment(SwingConstants.CENTER);
         this.refuteDisplay.setBorder(BorderFactory.createLineBorder(Color.white));
-
 
         JPanel playerInfo = new JPanel(new GridLayout(5, 1));
         playerInfo.add(currentPlayer);
@@ -160,10 +169,20 @@ public class MurderM extends Subject implements WindowListener {
 
     public void resetDisplay(){
         this.currentPlayer.setText("");
+
         this.stepDisplay.setText("");
-        this.handDisplay.setText("");
-        this.guessDisplay.setText("");
-        this.refuteDisplay.setText("");
+
+        this.handDisplay.removeAll();
+        this.handDisplay.revalidate();
+        this.handDisplay.repaint();
+
+        this.guessDisplay.removeAll();
+        this.guessDisplay.revalidate();
+        this.guessDisplay.repaint();
+
+        this.refuteDisplay.removeAll();
+        this.refuteDisplay.revalidate();
+        this.refuteDisplay.repaint();
     }
 
     public JMenuBar addMenu() {
@@ -189,23 +208,27 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public void setCurrentPlayer(String actualName, String characterName) {
-
-        currentPlayer.setText("Its currently " + actualName + "s (" + characterName + ")" + " turn");
-
+        ImageIcon icon = new ImageIcon(game.getCurrent().getCellImage());
+        currentPlayer.setIcon(icon);
+        currentPlayer.setText("<html> " + "It's currently " + actualName + "'s (" + characterName + ")" + " turn" + "</html>");
     }
 
     public void displaySteps() {
+        Image image = null;
+        try { image = ImageIO.read(new File("src/resources/dice.png"));
+        } catch (IOException e) { e.printStackTrace(); }
+        ImageIcon icon = new ImageIcon(image.getScaledInstance(48, 48, Image.SCALE_DEFAULT));
+        stepDisplay.setIcon(icon);
+
         if (!game.getCurrent().getRollStatus()) {
-            stepDisplay.setText("Please roll too get your steps");
+            stepDisplay.setText("<html> Please roll to get your steps </html>");
         } else if (game.getCurrent().getSteps() == 0) {
-            stepDisplay.setText("You are out of steps!");
+            stepDisplay.setText("<html> You are out of steps! </html>");
         } else {
-            String sb = "<html>You rolled a " + game.getCurrent().getD1() + " and a " + game.getCurrent().getD2() + "<br/>" +
-                    "You currently have " + game.getCurrent().getSteps() + " steps left" + "</html>";
+            String sb = "<html> You rolled a " + game.getCurrent().getD1() + " and a " + game.getCurrent().getD2() + "<br/>" +
+                    " You currently have " + game.getCurrent().getSteps() + " steps left" + "</html>";
             stepDisplay.setText(sb);
-
         }
-
     }
 
     public void setHandDisplay(Boolean b) {
@@ -213,40 +236,42 @@ public class MurderM extends Subject implements WindowListener {
     }
 
     public void displayHand(List<Card> hand) {
-        StringBuilder sb = new StringBuilder();
+        JLabel title = new JLabel("<html> Your current hand is: <br/></html>");
+        this.handDisplay.add(title);
 
-        sb.append("<html> Your current hand is: <br/>");
-        for (int i = 0; i < hand.size(); i++) {
-            sb.append(i).append(":").append(hand.get(i).getName()).append("<br/>");
+        for(int i = 0; i < hand.size(); i++){
+            JLabel handLabel = new JLabel();
+            ImageIcon icon = new ImageIcon(hand.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
+            handLabel.setIcon(icon);
+            handLabel.setText("<html> " + (i+1) + ". " + hand.get(i).getName() + "<br/></html>");
+            this.handDisplay.add(handLabel);
         }
-        sb.append("</html>");
-        handDisplay.setText(sb.toString());
-
-
     }
 
     public void displayGuess(List<Card> guess) {
-        StringBuilder sb = new StringBuilder();
+        JLabel title = new JLabel("<html> The current guess by " + game.getCurrent().getActualName() + " is: <br/></html>");
+        this.guessDisplay.add(title);
 
-        sb.append("<html> The current guess by ").append(game.getCurrent().getActualName()).append(" is: <br/>");
-        for (int i = 0; i < guess.size(); i++) {
-            sb.append(i).append(":").append(guess.get(i).getName()).append("<br/>");
+        for(int i = 0; i < guess.size(); i++){
+            JLabel guessLabel = new JLabel();
+            ImageIcon icon = new ImageIcon(guess.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
+            guessLabel.setIcon(icon);
+            guessLabel.setText("<html> " + (i+1) + ". " + guess.get(i).getName() + "<br/></html>");
+            this.guessDisplay.add(guessLabel);
         }
-        sb.append("</html>");
-        guessDisplay.setText(sb.toString());
-
     }
 
     public void displayRefute(List<Card> refute) {
-        StringBuilder sb = new StringBuilder();
+        JLabel title = new JLabel("<html> The refute for your guess is: <br/></html>");
+        this.refuteDisplay.add(title);
 
-        sb.append("<html>Refute for your guess is: <br/>");
-        for (int i = 0; i < refute.size(); i++) {
-            sb.append(i).append(":").append(refute.get(i).getName()).append("<br/>");
+        for(int i = 0; i < refute.size(); i++){
+            JLabel refuteLabel = new JLabel();
+            ImageIcon icon = new ImageIcon(refute.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
+            refuteLabel.setIcon(icon);
+            refuteLabel.setText("<html> " + (i+1) + ". " + refute.get(i).getName() + "<br/></html>");
+            this.refuteDisplay.add(refuteLabel);
         }
-        sb.append("</html>");
-        refuteDisplay.setText(sb.toString());
-
     }
 
 
