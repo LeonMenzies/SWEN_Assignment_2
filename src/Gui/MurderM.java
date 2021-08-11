@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MurderM extends Subject implements WindowListener{
+public class MurderM extends Subject implements WindowListener, ComponentListener{
 
     private Game game = new Game(this);
     private final JFrame frame;
@@ -56,7 +56,6 @@ public class MurderM extends Subject implements WindowListener{
         Board board = new Board(24, 24);
         board.setup();
         BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
-        boardCanvas.setSize(576, 576);
         MurderM m = new MurderM(board, boardCanvas);
         m.guiSetup();
     }
@@ -104,15 +103,14 @@ public class MurderM extends Subject implements WindowListener{
 
         frame.setJMenuBar(addMenu());
         frame.getContentPane().add(boardCanvas, BorderLayout.CENTER);
-        frame.getContentPane().add(createButtons(), BorderLayout.PAGE_END);
+        frame.getContentPane().add(createButtons(), BorderLayout.SOUTH);
         boardCanvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
 
-                int xClick = (int) Math.floor(e.getX() / 24.0);
-                int yClick = (int) Math.floor(e.getY() / 24.0);
-
+                int xClick = (int) Math.floor(e.getX() / (boardCanvas.getBounds().getWidth()/24.0));
+                int yClick = (int) Math.floor(e.getY() / (boardCanvas.getBounds().getHeight()/24.0));
                 if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
 
                     Cell selected = board.getCell(yClick, xClick);
@@ -130,7 +128,7 @@ public class MurderM extends Subject implements WindowListener{
         });
 
 
-        frame.getContentPane().add(createDisplay(), BorderLayout.LINE_END);
+        frame.getContentPane().add(createDisplay(), BorderLayout.EAST);
         frame.addWindowListener(this);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -154,7 +152,8 @@ public class MurderM extends Subject implements WindowListener{
         } catch (UnsupportedLookAndFeelException exc) {
             System.err.println("Nimbus: Unsupported Look and feel!");
         }
-
+        frame.setResizable(true);
+        frame.addComponentListener(this);
         frame.setVisible(true);
     }
 
@@ -729,5 +728,26 @@ public class MurderM extends Subject implements WindowListener{
     }
 
 
+    @Override
+    public void componentResized(ComponentEvent e) {
+        boardCanvas.updateSize(boardCanvas.getBounds().width,boardCanvas.getBounds().height);
+        boardCanvas.updateEstates(boardCanvas.getBounds().width,boardCanvas.getBounds().height);
+
+    }
+
+    @Override
+    public void componentMoved(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentShown(ComponentEvent e) {
+
+    }
+
+    @Override
+    public void componentHidden(ComponentEvent e) {
+
+    }
 }
 

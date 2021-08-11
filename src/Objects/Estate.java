@@ -19,10 +19,16 @@ public class Estate {
     private List<Cell> exitCells;
     private Image estateImg;
     private int row, col;
+    private int xSize;
+    private int ySize;
+    private int endX;
+    private int endY;
 
 
 
-    public Estate(String estateName, List<Integer> availableCells, int row, int col, Image estateImg) {
+    public Estate(String estateName, List<Integer> availableCells, int row, int col, Image estateImg, int endX , int endY) {
+        this.xSize = 24;
+        this.ySize = 24;
         this.estateName = estateName;
         this.estateCellList = new ArrayList<>();
         this.exitCells = new ArrayList<>();
@@ -32,6 +38,8 @@ public class Estate {
         this.weaponsInEstate = new ArrayList<>();
         this.estateImg = estateImg;
         this.row = row; this.col = col;
+        this.endX = endX;
+        this.endY = endY;
     }
 
     /**
@@ -45,10 +53,10 @@ public class Estate {
 
 
     public void redrawEstate(Graphics g) {
-        int SIZE = 24;
 
 
-        g.drawImage(estateImg, col * SIZE, row * SIZE, estateImg.getWidth(null) / 2, estateImg.getHeight(null) / 2, null);
+
+        g.drawImage(estateImg, col * xSize, row * ySize, endX * xSize, endY * ySize, null);
 
 
         //Special method for picking the right location to redraw the players in the estate
@@ -57,7 +65,7 @@ public class Estate {
             int row = estateCellList.get(availableCells.get(i)).getRow();
             int col = estateCellList.get(availableCells.get(i)).getCol();
 
-            g.drawImage(objectsInEstate.get(i).getCellImage(), col * SIZE, row * SIZE,  SIZE, SIZE, null);
+            g.drawImage(objectsInEstate.get(i).getCellImage(), col * xSize, row * ySize,  xSize, ySize, null);
         }
     }
 
@@ -117,6 +125,11 @@ public class Estate {
     public void removeWeaponInEstate(Weapon aWeapon){
         this.weaponsInEstate.remove(aWeapon);
         this.objectsInEstate.remove(aWeapon);
+    }
+
+    public void updateSize(int newX, int newY){
+        this.xSize = newX/24;
+        this.ySize = newY/24;
     }
 
     public String getEstateName(){

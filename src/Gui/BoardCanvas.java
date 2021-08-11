@@ -18,15 +18,21 @@ public class BoardCanvas extends JPanel implements Observer {
     Map<String, Estate> estates;
     List<Player> players;
     List<Weapon> weapons;
-    public final int SIZE = 24;
+   private int xSize;
+   private int ySize;
+
 
     public BoardCanvas(Board board, Cell[][] cells, Map<String, Image> cellImages, List<Weapon> wp, Map<String, Estate> estates, List<Player> players) {
+
         this.board = board;
         this.cells = cells;
         this.cellImages = cellImages;
         this.estates = estates;
         this.players = players;
         this.weapons = wp;
+        xSize = 24;
+        ySize = 24;
+        this.setLayout(new BorderLayout());
     }
 
     @Override
@@ -39,11 +45,11 @@ public class BoardCanvas extends JPanel implements Observer {
 
         for (Cell[] c1 : cells) {
             for (Cell c2 : c1) {
-                g.drawImage(c2.getCellImage(), xStep, yStep, SIZE, SIZE, null);
-                xStep += SIZE;
+                g.drawImage(c2.getCellImage(), xStep, yStep, xSize, ySize, null);
+                xStep += xSize;
             }
             xStep = 0;
-            yStep += SIZE;
+            yStep += ySize;
         }
 
         //paint the estates on the board
@@ -56,14 +62,24 @@ public class BoardCanvas extends JPanel implements Observer {
         for (Player p : players) {
 
             //Dont draw the player if in the estate
-            g.drawImage(p.getCellImage(), p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE, null);
+            g.drawImage(p.getCellImage(), p.getCol() * xSize, p.getRow() * ySize, xSize, ySize, null);
 
             if (p.getTurn()) {
                 g.setColor(new Color(200, 0, 0, 100));
-                g.fillOval(p.getCol() * SIZE, p.getRow() * SIZE, SIZE, SIZE);
+                g.fillOval(p.getCol() * xSize, p.getRow() * ySize, xSize, ySize);
             }
 
         }
+    }
+
+    public void updateEstates(int newX , int newY){
+        for(Map.Entry<String, Estate> estates : estates.entrySet()) {
+            estates.getValue().updateSize(newX,newY);
+        }
+    }
+    public void updateSize(int newX, int newY){
+        this.xSize = newX/24;
+        this.ySize = newY/24;
     }
 
     @Override

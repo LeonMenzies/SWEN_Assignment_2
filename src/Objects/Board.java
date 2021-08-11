@@ -59,11 +59,11 @@ public class Board {
 
         try {
 
-            estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/estate_haunted_house.png"))));
-            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/estate_manic_manor.png"))));
-            estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/estate_peril_palace.png"))));
-            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/estate_calamity_castle.png"))));
-            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 10, 9, ImageIO.read(new File("src/resources/estate_villa_celia.png"))));
+            estates.put("Haunted Door", new Estate("Haunted House", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 2, ImageIO.read(new File("src/resources/estate_haunted_house.png")),5,5));
+            estates.put("Manic Door", new Estate("Manic Manor", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 2, 17, ImageIO.read(new File("src/resources/estate_manic_manor.png")),5,5));
+            estates.put("Peril Door", new Estate("Peril Palace", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 17, ImageIO.read(new File("src/resources/estate_peril_palace.png")),5,5));
+            estates.put("Calamity Door", new Estate("Calamity Castle", new ArrayList<>(Arrays.asList(6, 7, 8, 11, 12, 13, 16, 17, 18)), 17, 2, ImageIO.read(new File("src/resources/estate_calamity_castle.png")),5,5));
+            estates.put("Villa Door", new Estate("Villa Celia", new ArrayList<>(Arrays.asList(7, 8, 9, 10, 13, 14, 15, 16, 17)), 10, 9, ImageIO.read(new File("src/resources/estate_villa_celia.png")),6,4));
         } catch (IOException e) {
             System.out.println("Image cannot be found");
         }
