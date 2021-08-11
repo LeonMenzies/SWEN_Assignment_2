@@ -371,9 +371,13 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         buttons.setLayout(new FlowLayout());
 
         JButton roll = new JButton("Roll (R)");
+        roll.setFocusable(false);
         JButton guess = new JButton("Make Guess");
+        guess.setFocusable(false);
         JButton finalGuess = new JButton("Make Final Guess");
+        finalGuess.setFocusable(false);
         JButton endTurn = new JButton("End Turn (E)");
+        endTurn.setFocusable(false);
 
         buttons.add(roll);
         buttons.add(guess);
