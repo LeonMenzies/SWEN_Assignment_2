@@ -187,12 +187,11 @@ public class Game{
                    if(gameWon){
                        playGame();
                    }else{
+                       gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
                        currentPlayer.setIsout(true);
                        gameOver = checkGameOver();
-                       if(gameOver){
-                           playGame();
-                       }
-                       gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
+                      playGame();
+
                    }
 
                 }
