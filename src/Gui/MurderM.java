@@ -16,7 +16,9 @@ import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class MurderM extends Subject implements WindowListener, ComponentListener {
 
@@ -29,7 +31,10 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     JPanel guessDisplay;
     JPanel refuteDisplay;
     JLabel stepDisplay;
+    private ArrayList<String> charNames;
     JMenuItem i1, i2, i3;
+
+
     private JLabel currentPlayer;
 
 
@@ -38,6 +43,8 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         this.boardCanvas = bc;
         super.addObserver(boardCanvas);
         this.frame = new JFrame();
+        charNames = new ArrayList<>();
+        monkeys();
     }
 
     public static void main(String[] args) {
@@ -74,7 +81,8 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      */
 
     public void setUp() {
-        setUpPlayerNames();
+        chooseCharacters(3);
+        //setUpPlayerNames();
         if (names != null) {
             //sets the start button to disabled
             i1.setEnabled(false);
@@ -87,6 +95,13 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         }
     }
 
+
+    public void monkeys(){
+        charNames.add("Bert");
+        charNames.add("Terry");
+        charNames.add("leon");
+        charNames.add("Harry");
+    }
 
     /**
      * Sets up gui by adding all the buttons and menus to the frame then creating the color theme
@@ -739,6 +754,63 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     @Override
     public void componentHidden(ComponentEvent e) {
 
+    }
+
+
+    private void chooseCharacters(int numOfPlayers) {
+        JPanel playerDets = new JPanel();
+
+        JPanel nameLabel = new JPanel();
+        JPanel cP = new JPanel();
+        JTextFieldChecker JC = new JTextFieldChecker();
+        JTextField playerfield = new JTextField();
+        JC.addTextField(playerfield);
+        ButtonGroup bG = new ButtonGroup();
+        ArrayList<JRadioButton> buttons = new ArrayList<>();
+
+        // Set up the character selection popup screen
+        playerDets.setLayout(new BoxLayout(playerDets, BoxLayout.PAGE_AXIS));
+
+        for (String names : charNames) {
+            JRadioButton characterRadioButton = new JRadioButton(names);
+            bG.add(characterRadioButton);
+            buttons.add(characterRadioButton);
+            cP.add(characterRadioButton);
+        }
+        playerDets.add(cP);
+        nameLabel.setLayout(new BorderLayout());
+        nameLabel.add(new JLabel("Enter your name:"), BorderLayout.WEST);
+        playerDets.add(nameLabel);
+        playerDets.add(playerfield);
+
+        // Ask players for their name and the character they pick
+        String playerName;
+
+        boolean playerCreated;
+
+        for (int i = 0; i < numOfPlayers; i++) {
+            playerCreated = false;
+            while (!playerCreated) {
+                playerfield.setText("");
+                bG.clearSelection();
+                while (!JC.isDataEntered()) {
+                    JOptionPane.showConfirmDialog(null, playerDets,
+                            "Please Enter Player "+ (i+1)+ " Information", JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+                    playerName = playerfield.getText();
+                    for (JRadioButton button : buttons) {
+                        if (button.isSelected() && playerName.length() > 0) {
+                            //charNames[i] = playerfield.getText();
+                           button.setEnabled(false);
+                            playerCreated = true;
+                        }
+                    }
+                }
+
+
+            }
+
+        }
     }
 }
 

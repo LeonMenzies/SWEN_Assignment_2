@@ -9,9 +9,10 @@ import Main.Game;
 import Objects.Board;
 import Objects.Player;
 import Objects.Estate;
+import org.junit.Test;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+
 
 import java.util.*;
 

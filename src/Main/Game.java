@@ -50,16 +50,28 @@ public class Game{
         return currentPlayer;
     }
 
+
+    /**
+     *  Gets the current status of the game
+     *
+     * @return true if !gameOver and !gameWon
+     */
     public boolean getGameStatus(){
         return !gameOver && !gameWon;
     }
 
 
-
+    /**
+     *  Play game goes through and checkes the status of the game and then decides what action to take.
+     *  If game is over will display no one has won, If game is won will display who has won
+     *  otherwise the next players turn gets started
+     */
     public void playGame(){
         if(!gameWon && !gameOver) {
+            //pulls the number from the que
             Integer pt = playerOrder.poll();
             if(pt != null) {
+                //sets the current player to that person in the array and clears all there variables for their turn
                 playerTurn = pt;
                 currentPlayer = players.get(playerTurn);
                 currentPlayer.setTurn(true);
@@ -67,11 +79,14 @@ public class Game{
                 currentPlayer.clearVisted();
                 currentPlayer.setRollStatus(false);
                 currentPlayer.setGuessStatus(false);
+                //updates the gui with who's turn then displays all there information such as hand, steps
+                gui.displayPlayer(currentPlayer.getActualName());
                 gui.displaySteps();
                 gui.setCurrentPlayer(currentPlayer.getActualName(),currentPlayer.getName());
                 gui.displayHand(currentPlayer.getHand());
-                gui.displayPlayer(currentPlayer.getActualName());
+
             }
+            //updates the gui with who has won
         }else if(gameWon && !gameOver){
             gui.displayOkOption(currentPlayer.getActualName() + " has won!", "Winner");
         }else if(!gameWon){
@@ -79,12 +94,18 @@ public class Game{
         }
     }
 
+
+    /**
+     *  sets the gameStarted boolean variable
+     *
+     * @param b boolean true or false
+     */
     public void setGameStarted(boolean b){
         gameStarted = b;
     }
 
     /**
-     * Objects.Player is making final guess checks to see if they have won or not
+     * Player is making final guess checks to see if they have won or not
      *
      * @param guess list of the current guess
      * @return true or false if all the cards match
@@ -105,17 +126,22 @@ public class Game{
     }
 
 
+    /**
+     *Ends the current players turn checks to see if they are out of steps on in an estate first
+     */
 
     public void endTurn(){
-
+        //checks to see what state the game is in
         if(gameStarted && !gameWon && !gameOver) {
             int result = gui.displayOkOption("Are you sure want to end your turn?", "End Turn");
             if(result == 0) {
+                //if the players steps are 0 and they are in estate checks they arent out if they are out there number doesnt get put back into the que
                 if(currentPlayer.getSteps() == 0 || !currentPlayer.getEstateInString().equals("null")) {
                     if (!currentPlayer.getIsOut()) {
                         currentPlayer.setTurn(false);
                         playerOrder.offer(playerTurn);
                     }
+                    //resets the display for the next play and calls the playGame method
                     gui.resetDisplay();
                     playGame();
                 }else{
@@ -126,8 +152,14 @@ public class Game{
         }
     }
 
+
+    /**
+     * Rolls the dice for the player and sets there variables then displays there steps
+     */
     public void roll(){
+        //checks current status of the game
         if(gameStarted && !gameWon && !gameOver) {
+            //if they have rolled rolls the dice and displays for player
             if (!currentPlayer.getRollStatus()) {
                 currentPlayer.roll();
                 currentPlayer.setRollStatus(true);
@@ -139,6 +171,12 @@ public class Game{
         }
 
     }
+
+    /**
+     * Method that goes through all the current players in the game and checks if they are all out
+     *
+     * @return true if all out otherwise false
+     */
     public boolean checkGameOver(){
         int count = 0;
         for(Player p : players){
@@ -149,17 +187,24 @@ public class Game{
         return players.size() == count;
     }
 
+
+    /**
+     * Guess clears the guess deck and refute deck. Makes a new guess panel with the temp deck then moves the selected characters and weapons into the right estate
+     */
     public void makeGuess() {
+        //checks current game state
         if(gameStarted && !gameWon && !gameOver) {
             guessDeck.clear();
             refuteCards.clear();
             if (!currentPlayer.getGuessStatus() && !currentPlayer.getEstateInString().equals("null")) {
                 guessDeck = gui.makeGuess(tempDeck);
                 if (guessDeck.size() > 0) {
+                    //moves the characters and weapons then disable the current players hand so other cant see and displays there guess
                     moveCharacters();
                     currentPlayer.setGuessStatus(true);
                     gui.setHandDisplay(false);
                     gui.displayGuess(guessDeck);
+                    //calls the refute method with the new guess deck
                     refute(guessDeck);
 
                 }
@@ -171,16 +216,23 @@ public class Game{
 
     }
 
+
+    /**
+     * Player makes a final guess from a list of cards. Then checks if they have won or are out
+     */
     public void finalGuess(){
         if(gameStarted && !gameWon && !gameOver){
             guessDeck.clear();
             if(!currentPlayer.getGuessStatus()){
                 guessDeck = gui.makeGuess(tempDeck);
                 if(guessDeck.size() > 0){
+                    //checks they have won and sets gameWon
                    gameWon = checkWin(guessDeck);
                    if(gameWon){
+                       //if they have won go straight to playgame and announce the victor
                        playGame();
                    }else{
+                       //sets the player is out. Displays they are out then checks if everryone is out
                        gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
                        currentPlayer.setIsout(true);
                        gameOver = checkGameOver();
@@ -196,16 +248,21 @@ public class Game{
         }
     }
 
+    /**
+     * Goes through every player expect the one making the guess and prompts them to make a refute
+     */
     public void refute(ArrayList<Card> guess) {
+        //gets the right order for disputing
         refuteOrder(currentPlayer);
-        //display guess
 
+        //checks if there refute wasnt null and adds it to the list of refutes
         for (Player p : tempPlayers) {
           Card c = gui.refute(guess,p);
           if(c != null){
               refuteCards.add(c);
           }
         }
+        //prompts for player guessing to get the tablet back then displays there hand again and the refute
         gui.displayOkOption("Please hand the tablet back to "+ currentPlayer.getActualName(), "Refute");
         gui.displayRefute(refuteCards);
         gui.setHandDisplay(true);
@@ -254,7 +311,7 @@ public class Game{
 
 
     /**
-     * Objects.Move the the weapon and player the on the board into the estate that the player is making the guess in
+     * OMove the the weapon and player the on the board into the estate that the player is making the guess in
      *
      */
 
@@ -425,6 +482,13 @@ public class Game{
 
 
     }
+
+    /**
+     * Method to setUp the aspects of the game such as player names, all the cards and what the murder circumstance is
+     *
+     * @param names list of players actual names
+     */
+
 
     public void setUp(String[] names){
         playerSetUp(names);
