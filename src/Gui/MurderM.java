@@ -98,7 +98,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     public void guiSetup() {
         frame.setSize(800, 700);
-        frame.setResizable(false);
+        frame.setResizable(true);
         frame.setLayout(new BorderLayout());
 
         frame.setJMenuBar(addMenu());
@@ -152,7 +152,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         } catch (UnsupportedLookAndFeelException exc) {
             System.err.println("Nimbus: Unsupported Look and feel!");
         }
-        frame.setResizable(true);
         frame.addComponentListener(this);
         frame.setVisible(true);
     }
