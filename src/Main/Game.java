@@ -39,13 +39,7 @@ public class Game{
 
     Player currentPlayer = null;
     private final MurderM gui;
-
-
-
     private final Board board;
-
-
-
 
     public Game(MurderM gui) {
         this.board = gui.getBoard();
