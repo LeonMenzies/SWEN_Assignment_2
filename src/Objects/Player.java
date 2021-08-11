@@ -2,7 +2,6 @@ package Objects;
 
 import Cards.*;
 import Cells.*;
-import Gui.BoardCanvas;
 
 import java.awt.*;
 import java.util.*;
@@ -13,7 +12,7 @@ import java.util.Random;
  * The player class holds all the information about the player and its status in the game. The object also has all the methods for
  * moving the player around the board, as well as going in and out of estate objects
  */
-public class Player extends Move implements Cloneable, Movable {
+public class Player implements Cloneable, Drawable {
     private boolean turn = false;
     private Estate estateIn = null;
     private String name;
@@ -27,7 +26,6 @@ public class Player extends Move implements Cloneable, Movable {
     private int steps = 0;
     private boolean rollStatus = false;
     private boolean isOut = false;
-    private boolean hasWon = false;
     private boolean hasGuessed = false;
     private String actualName;
     private String direction;
@@ -39,7 +37,6 @@ public class Player extends Move implements Cloneable, Movable {
     private List<Cell> visited;
 
     public Player(String name, int row, int col, HashMap<String, Image> playerImages, String actualName, String defaultDirection) {
-        super(row, col);
         this.playerImages = playerImages;
         this.direction = defaultDirection;
         this.name = name;
@@ -91,7 +88,8 @@ public class Player extends Move implements Cloneable, Movable {
     /**
      * after checking the move is valid move the player on the given board
      *
-     * @param b the current board
+     * @param b        the current board
+     * @param selected the cell the player is attempting to move to
      */
     public boolean move(Board b, Cell selected) {
 
@@ -102,6 +100,7 @@ public class Player extends Move implements Cloneable, Movable {
                 this.row = selected.getRow();
                 this.col = selected.getCol();
 
+                //remove the player from the estate and add them to the board
                 estateIn.removePlayersInEstate(this);
                 estateIn = null;
                 b.addPlayer(this);
@@ -116,13 +115,13 @@ public class Player extends Move implements Cloneable, Movable {
         else if (isValid(b, selected)) {
 
             //Turn the player to the face the way they are going
-            if(row > selected.getRow()){
+            if (row > selected.getRow()) {
                 direction = "up";
-            } else if(row < selected.getRow()){
+            } else if (row < selected.getRow()) {
                 direction = "down";
             } else if (col > selected.getCol()) {
                 direction = "left";
-            } else if(col < selected.getCol()){
+            } else if (col < selected.getCol()) {
                 direction = "right";
             }
 
@@ -139,10 +138,10 @@ public class Player extends Move implements Cloneable, Movable {
      * This method is for checking if a desired player move is a valid move or not
      * It also checks if the player is trying to enter an estate and reacts accordingly
      *
-     * @param b the current board
+     * @param b        the current board
+     * @param selected the selected cell to move to
      * @return true or false if this is a vailid move
      */
-    @Override
     public boolean isValid(Board b, Cell selected) {
 
         if (!visited.contains(selected) && selected instanceof FreeCell) {
@@ -165,7 +164,7 @@ public class Player extends Move implements Cloneable, Movable {
         return false;
     }
 
-    public void clearVisted(){
+    public void clearVisted() {
         visited.clear();
     }
 

@@ -11,6 +11,9 @@ import java.awt.*;
 import java.util.Map;
 import java.util.List;
 
+/***
+ * The BoardCanvas is in charge of displaying the board visually to the player
+ */
 public class BoardCanvas extends JPanel implements Observer {
     private Board board;
     private Cell[][] cells;
@@ -18,8 +21,8 @@ public class BoardCanvas extends JPanel implements Observer {
     Map<String, Estate> estates;
     List<Player> players;
     List<Weapon> weapons;
-   private int xSize;
-   private int ySize;
+    private int xSize;
+    private int ySize;
 
 
     public BoardCanvas(Board board, Cell[][] cells, Map<String, Image> cellImages, List<Weapon> wp, Map<String, Estate> estates, List<Player> players) {
@@ -35,9 +38,13 @@ public class BoardCanvas extends JPanel implements Observer {
         this.setLayout(new BorderLayout());
     }
 
+    /**
+     * paint the components on the JPanel
+     *
+     * @param g The swing Graphics object
+     */
     @Override
     public void paint(Graphics g) {
-
 
         //paint the cells on the board
         int xStep = 0;
@@ -72,16 +79,32 @@ public class BoardCanvas extends JPanel implements Observer {
         }
     }
 
-    public void updateEstates(int newX , int newY){
-        for(Map.Entry<String, Estate> estates : estates.entrySet()) {
-            estates.getValue().updateSize(newX,newY);
+    /**
+     * This method is for resizing the estate images
+     *
+     * @param newX new x location
+     * @param newY new y location
+     */
+    public void updateEstates(int newX, int newY) {
+        for (Map.Entry<String, Estate> estates : estates.entrySet()) {
+            estates.getValue().updateSize(newX, newY);
         }
     }
-    public void updateSize(int newX, int newY){
-        this.xSize = newX/24;
-        this.ySize = newY/24;
+
+    /**
+     * This method is for resizing the estates when the window changes size
+     *
+     * @param newX new x location
+     * @param newY new y location
+     */
+    public void updateSize(int newX, int newY) {
+        this.xSize = newX / 24;
+        this.ySize = newY / 24;
     }
 
+    /**
+     * this method is part of the MVC design and updates the board by repainting the graphics
+     */
     @Override
     public void update() {
         cells = board.getCells();

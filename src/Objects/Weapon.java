@@ -5,7 +5,7 @@ import java.awt.*;
 /***
  * A weapon object represents a weapon that is part of the game and can be used in guess of the murder
  */
-public class Weapon implements Movable{
+public class Weapon implements Drawable {
     String wepName;
 
     int row;
@@ -15,9 +15,10 @@ public class Weapon implements Movable{
 
     /**
      * Create a new weapon object
-     * @param name the name if the weapon
-     * @param row the row of the weapon on the board
-     * @param col the col of the weapon on the board
+     *
+     * @param name   the name if the weapon
+     * @param row    the row of the weapon on the board
+     * @param col    the col of the weapon on the board
      * @param estate the estate the weapon starts in
      */
     public Weapon(String name, int row, int col, Estate estate, Image wpImg) {
@@ -43,13 +44,14 @@ public class Weapon implements Movable{
         return wepName;
     }
 
-    public Image getCellImage(){
+    public Image getCellImage() {
         return this.weaponImg;
     }
 
 
     /**
      * The string representation of this weapon object
+     *
      * @return The first two letters of weapons name
      */
     @Override

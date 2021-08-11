@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MurderM extends Subject implements WindowListener, ComponentListener{
+public class MurderM extends Subject implements WindowListener, ComponentListener {
 
     private Game game = new Game(this);
     private final JFrame frame;
@@ -31,7 +31,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     JLabel stepDisplay;
     JMenuItem i1, i2, i3;
     private JLabel currentPlayer;
-
 
 
     public MurderM(Board b, BoardCanvas bc) {
@@ -48,7 +47,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     /**
      * Method sets up the game by creating a new board and MurderM
-     *
      */
 
     private static void setUpGame() {
@@ -61,13 +59,11 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
 
-
     /**
      * Gets the board
      *
      * @return the current board
      */
-
     public Board getBoard() {
         return board;
     }
@@ -109,8 +105,8 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
             public void mousePressed(MouseEvent e) {
                 super.mousePressed(e);
 
-                int xClick = (int) Math.floor(e.getX() / (boardCanvas.getBounds().getWidth()/24.0));
-                int yClick = (int) Math.floor(e.getY() / (boardCanvas.getBounds().getHeight()/24.0));
+                int xClick = (int) Math.floor(e.getX() / (boardCanvas.getBounds().getWidth() / 24.0));
+                int yClick = (int) Math.floor(e.getY() / (boardCanvas.getBounds().getHeight() / 24.0));
                 if (xClick >= 0 && xClick <= 23 && yClick >= 0 && yClick <= 23) {
 
                     Cell selected = board.getCell(yClick, xClick);
@@ -157,7 +153,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
     /**
-     *For each item that needs to be displayed makes sure they are all the same size and text is to the left and the Jlabels are center
+     * For each item that needs to be displayed makes sure they are all the same size and text is to the left and the Jlabels are center
      */
 
     public JPanel createDisplay() {
@@ -195,11 +191,12 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
         return playerInfo;
     }
+
     /**
      * Used to clear the panels to left of the board that hold the the players information
      */
 
-    public void resetDisplay(){
+    public void resetDisplay() {
         this.currentPlayer.setText("");
 
         this.stepDisplay.setText("");
@@ -247,7 +244,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     /**
      * Method for setting the panel to the left of the board that states who's turn it is
      *
-     * @param actualName players actual name they entered at the start
+     * @param actualName    players actual name they entered at the start
      * @param characterName the characters name
      */
 
@@ -265,10 +262,13 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     public void displaySteps() {
         //trys to set the label icon to the one in the resources
         Image image = null;
-        try { image = ImageIO.read(new File("src/resources/dice.png"));
-        } catch (IOException e) { e.printStackTrace(); }
+        try {
+            image = ImageIO.read(new File("src/resources/dice.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
         ImageIcon icon;
-        if(image != null) {
+        if (image != null) {
             icon = new ImageIcon(image.getScaledInstance(48, 48, Image.SCALE_DEFAULT));
             stepDisplay.setIcon(icon);
         }
@@ -305,15 +305,14 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         JLabel title = new JLabel("<html> Your current hand is: <br/></html>");
         this.handDisplay.add(title);
 
-        for(int i = 0; i < hand.size(); i++){
+        for (int i = 0; i < hand.size(); i++) {
             JLabel handLabel = new JLabel();
             ImageIcon icon = new ImageIcon(hand.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
             handLabel.setIcon(icon);
-            handLabel.setText("<html> " + (i+1) + ". " + hand.get(i).getName() + "<br/></html>");
+            handLabel.setText("<html> " + (i + 1) + ". " + hand.get(i).getName() + "<br/></html>");
             this.handDisplay.add(handLabel);
         }
     }
-
 
 
     /**
@@ -325,11 +324,11 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         JLabel title = new JLabel("<html> The current guess by " + game.getCurrent().getActualName() + " is: <br/></html>");
         this.guessDisplay.add(title);
 
-        for(int i = 0; i < guess.size(); i++){
+        for (int i = 0; i < guess.size(); i++) {
             JLabel guessLabel = new JLabel();
             ImageIcon icon = new ImageIcon(guess.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
             guessLabel.setIcon(icon);
-            guessLabel.setText("<html> " + (i+1) + ". " + guess.get(i).getName() + "<br/></html>");
+            guessLabel.setText("<html> " + (i + 1) + ". " + guess.get(i).getName() + "<br/></html>");
             this.guessDisplay.add(guessLabel);
         }
     }
@@ -343,15 +342,14 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         JLabel title = new JLabel("<html> The refute for your guess is: <br/></html>");
         this.refuteDisplay.add(title);
 
-        for(int i = 0; i < refute.size(); i++){
+        for (int i = 0; i < refute.size(); i++) {
             JLabel refuteLabel = new JLabel();
             ImageIcon icon = new ImageIcon(refute.get(i).getCardImage().getScaledInstance(24, 24, Image.SCALE_DEFAULT));
             refuteLabel.setIcon(icon);
-            refuteLabel.setText("<html> " + (i+1) + ". " + refute.get(i).getName() + "<br/></html>");
+            refuteLabel.setText("<html> " + (i + 1) + ". " + refute.get(i).getName() + "<br/></html>");
             this.refuteDisplay.add(refuteLabel);
         }
     }
-
 
 
     /**
@@ -404,9 +402,9 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == 69){
+                if (e.getKeyCode() == 69) {
                     game.endTurn();
-                } else if(e.getKeyCode() == 82){
+                } else if (e.getKeyCode() == 82) {
                     game.roll();
                 }
             }
@@ -426,8 +424,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      * Method for making a custom okay or cancel dialog panel
      *
      * @param message message to be displayed on dialog
-     * @param title title of the dialog
-     *
+     * @param title   title of the dialog
      * @return int of the option made by the user
      */
     public int displayOkOption(String message, String title) {
@@ -446,7 +443,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
     /**
-     *Pop up dialog that displays who's turn it is at the start of their turn to make sure they have the tablet before continuing
+     * Pop up dialog that displays who's turn it is at the start of their turn to make sure they have the tablet before continuing
      *
      * @param playerName name of player
      */
@@ -459,7 +456,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      * Creates a new guess panel containing radio buttons of the list of cards the player can select from.
      *
      * @param tempDeck list of cards the player can make guess from
-     *
      * @return a list of cards that are the players guess
      */
 
@@ -511,7 +507,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      * Generates a refute panel for the selected player to make a refute with the cards in there hand
      *
      * @param guess list of the current guess
-     * @param p the player makeing the refute
+     * @param p     the player makeing the refute
      * @return a card if they have a correct refute or null if they cant
      */
 
@@ -551,7 +547,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      * Method for generating an error message pop up dialog
      *
      * @param message message to be displayed on the dialog
-     * @param title title of dialog
+     * @param title   title of dialog
      */
 
 
@@ -565,8 +561,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     /**
      * Pop up that gets all the player names for the game
-     *
-     *
      */
     public void setUpPlayerNames() {
         //game can be played with 3 or 4 players so that is first question asked
@@ -601,12 +595,12 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
             JTextFieldChecker JC = new JTextFieldChecker();
 
 
-           //loops through the number of players creates a new TextField adds them to the Textfield checker
-           //then adds a label and the created grid to the panel
-            for(int i = 0; i < names.length; i++){
+            //loops through the number of players creates a new TextField adds them to the Textfield checker
+            //then adds a label and the created grid to the panel
+            for (int i = 0; i < names.length; i++) {
                 JTextField name = new JTextField(5);
                 JC.addTextField(name);
-                dialogPanel.add(new JLabel("Player " + (i+1)+  " Name:"), createGbc(0, i));
+                dialogPanel.add(new JLabel("Player " + (i + 1) + " Name:"), createGbc(0, i));
                 dialogPanel.add(name, createGbc(1, i));
             }
 
@@ -640,7 +634,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     /**
      * Restarts the program by disposing the frame then calling setup again
-     *
      */
     public void restart() {
         frame.dispose();
@@ -651,7 +644,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     /**
      * Method for quitting out of the program checks if user wants to then either exits or does nothing
-     *
      */
     public void quit() {
         int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
@@ -664,7 +656,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     /**
      * On open window displays welcome message to users
-     *
      */
     @Override
     public void windowOpened(WindowEvent e) {
@@ -672,14 +663,12 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
 
-
     /**
      * Method for quitting out of the program checks if user wants to then either exits or does nothing
      *
-     * @param x  x location
+     * @param x x location
      * @param y y location
-     *
-     * @return  a new GridBagConstraints with the specified x and y
+     * @return a new GridBagConstraints with the specified x and y
      */
     private static GridBagConstraints createGbc(int x, int y) {
         GridBagConstraints gbc = new GridBagConstraints();
@@ -688,14 +677,13 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
 
-        gbc.anchor =  GridBagConstraints.WEST;
-        gbc.fill =  GridBagConstraints.BOTH;
-        gbc.insets =  new Insets(5, 0, 5, 5);
-        gbc.weightx =  0.1;
+        gbc.anchor = GridBagConstraints.WEST;
+        gbc.fill = GridBagConstraints.BOTH;
+        gbc.insets = new Insets(5, 0, 5, 5);
+        gbc.weightx = 0.1;
         gbc.weighty = 1.0;
         return gbc;
     }
-
 
 
     //unused implemented methods
@@ -733,8 +721,8 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
     @Override
     public void componentResized(ComponentEvent e) {
-        boardCanvas.updateSize(boardCanvas.getBounds().width,boardCanvas.getBounds().height);
-        boardCanvas.updateEstates(boardCanvas.getBounds().width,boardCanvas.getBounds().height);
+        boardCanvas.updateSize(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
+        boardCanvas.updateEstates(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
 
     }
 

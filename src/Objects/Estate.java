@@ -14,7 +14,7 @@ public class Estate {
     private List<Weapon> weaponsInEstate;
     private List<Player> playersInEstate;
     private List<Cell> estateCellList;
-    private List<Movable> objectsInEstate;
+    private List<Drawable> objectsInEstate;
     private List<Integer> availableCells;
     private List<Cell> exitCells;
     private Image estateImg;

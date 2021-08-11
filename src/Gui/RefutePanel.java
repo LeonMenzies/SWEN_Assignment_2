@@ -9,6 +9,9 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/***
+ * The RefutePanel is a gui component shown when a refution is made during gameplay
+ */
 public class RefutePanel extends JPanel implements ActionListener {
     List<JRadioButton> buttons = new ArrayList<>();
     List<Card> buttonNames;
@@ -41,6 +44,7 @@ public class RefutePanel extends JPanel implements ActionListener {
     public void actionPerformed(ActionEvent e) {
 
     }
+
 
     public Card cardSelected(){
         Card toReturn = null;
