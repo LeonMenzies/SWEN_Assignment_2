@@ -44,5 +44,8 @@ public class JTextFieldChecker implements DocumentListener {
     public void changedUpdate(DocumentEvent e) {
     }
 
+    public List<JTextField> getTextFields(){
+        return textFields;
+    }
 
 }

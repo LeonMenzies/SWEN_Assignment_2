@@ -25,15 +25,14 @@ public class MurderM extends Subject implements WindowListener{
     private String[] names;
     private final Board board;
     private final BoardCanvas boardCanvas;
-    private final ArrayList<JTextField> nameInfo = new ArrayList<>();
     JPanel handDisplay;
     JPanel guessDisplay;
     JPanel refuteDisplay;
     JLabel stepDisplay;
     JMenuItem i1, i2, i3;
     private JLabel currentPlayer;
-    private static final Insets WEST_INSETS = new Insets(5, 0, 5, 5);
-    private static final Insets EAST_INSETS = new Insets(5, 5, 5, 0);
+
+
 
     public MurderM(Board b, BoardCanvas bc) {
         this.board = b;
@@ -42,15 +41,47 @@ public class MurderM extends Subject implements WindowListener{
         this.frame = new JFrame();
     }
 
+    public static void main(String[] args) {
+        setUpGame();
+    }
 
+
+    /**
+     * Method sets up the game by creating a new board and MurderM
+     *
+     */
+
+    private static void setUpGame() {
+
+        Board board = new Board(24, 24);
+        board.setup();
+        BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
+        boardCanvas.setSize(576, 576);
+        MurderM m = new MurderM(board, boardCanvas);
+        m.guiSetup();
+    }
+
+
+
+    /**
+     * Gets the board
+     *
+     * @return the current board
+     */
 
     public Board getBoard() {
         return board;
     }
 
+
+    /**
+     * Method gets the game started by getting the playernames then creating a new game with this information then starting it
+     */
+
     public void setUp() {
         setUpPlayerNames();
         if (names != null) {
+            //sets the start button to disabled
             i1.setEnabled(false);
             this.game = new Game(this);
             game.setGameStarted(true);
@@ -61,13 +92,18 @@ public class MurderM extends Subject implements WindowListener{
         }
     }
 
+
+    /**
+     * Sets up gui by adding all the buttons and menus to the frame then creating the color theme
+     */
+
     public void guiSetup() {
         frame.setSize(800, 700);
         frame.setResizable(false);
         frame.setLayout(new BorderLayout());
 
         frame.setJMenuBar(addMenu());
-        frame.getContentPane().add(createCanvas(), BorderLayout.CENTER);
+        frame.getContentPane().add(boardCanvas, BorderLayout.CENTER);
         frame.getContentPane().add(createButtons(), BorderLayout.PAGE_END);
         boardCanvas.addMouseListener(new MouseAdapter() {
             @Override
@@ -121,6 +157,10 @@ public class MurderM extends Subject implements WindowListener{
 
         frame.setVisible(true);
     }
+
+    /**
+     *For each item that needs to be displayed makes sure they are all the same size and text is to the left and the Jlabels are center
+     */
 
     public JPanel createDisplay() {
 
@@ -206,13 +246,26 @@ public class MurderM extends Subject implements WindowListener{
         return menu;
     }
 
+    /**
+     * Method for setting the panel to the left of the board that states who's turn it is
+     *
+     * @param actualName players actual name they entered at the start
+     * @param characterName the characters name
+     */
+
     public void setCurrentPlayer(String actualName, String characterName) {
+        //sets the icon to the image of said player to also help with clarification
         ImageIcon icon = new ImageIcon(game.getCurrent().getCellImage());
         currentPlayer.setIcon(icon);
         currentPlayer.setText("<html> " + "It's currently " + actualName + "'s (" + characterName + ")" + " turn" + "</html>");
     }
 
+
+    /**
+     * Updates the info panel to the left of the board with the players current step status
+     */
     public void displaySteps() {
+        //trys to set the label icon to the one in the resources
         Image image = null;
         try { image = ImageIO.read(new File("src/resources/dice.png"));
         } catch (IOException e) { e.printStackTrace(); }
@@ -222,6 +275,8 @@ public class MurderM extends Subject implements WindowListener{
             stepDisplay.setIcon(icon);
         }
 
+
+        //different messages are displayed depending where the player is in there turn
         if (!game.getCurrent().getRollStatus()) {
             stepDisplay.setText("<html> Please roll to get your steps </html>");
         } else if (game.getCurrent().getSteps() == 0) {
@@ -233,10 +288,21 @@ public class MurderM extends Subject implements WindowListener{
         }
     }
 
+    /**
+     * Method to set the visibility of the display hand panel
+     *
+     * @param b boolean true of false
+     */
     public void setHandDisplay(Boolean b) {
         handDisplay.setVisible(b);
     }
 
+
+    /**
+     * Displays the current players hand on the player hand info panel
+     *
+     * @param hand players hand of cards
+     */
     public void displayHand(List<Card> hand) {
         JLabel title = new JLabel("<html> Your current hand is: <br/></html>");
         this.handDisplay.add(title);
@@ -250,6 +316,13 @@ public class MurderM extends Subject implements WindowListener{
         }
     }
 
+
+
+    /**
+     * Displays the current players guess for them and everyone refuting to see
+     *
+     * @param guess list of cards of the current players guess
+     */
     public void displayGuess(List<Card> guess) {
         JLabel title = new JLabel("<html> The current guess by " + game.getCurrent().getActualName() + " is: <br/></html>");
         this.guessDisplay.add(title);
@@ -263,6 +336,11 @@ public class MurderM extends Subject implements WindowListener{
         }
     }
 
+    /**
+     * Displays the refutes made by other players to the current player
+     *
+     * @param refute list of cards made up of other players refutes
+     */
     public void displayRefute(List<Card> refute) {
         JLabel title = new JLabel("<html> The refute for your guess is: <br/></html>");
         this.refuteDisplay.add(title);
@@ -277,10 +355,13 @@ public class MurderM extends Subject implements WindowListener{
     }
 
 
-    public JPanel createCanvas() {
-        return boardCanvas;
-    }
 
+    /**
+     * Creates the buttons for the panel adds in action listeners for the buttons as well a keyListener for the frame
+     * Also adds pop up tool tips for the buttons
+     *
+     * @return a new Jpanel comprising of the buttons
+     */
     public JPanel createButtons() {
         JPanel controls = new JPanel();
 
@@ -300,6 +381,7 @@ public class MurderM extends Subject implements WindowListener{
         buttons.add(finalGuess);
         buttons.add(endTurn);
 
+        //message that pops up when the buttons are hovered over
         roll.setToolTipText("Roll the dice to get your steps for this turn!");
         guess.setToolTipText("Make a guess and other players will have a chance to refute!");
         finalGuess.setToolTipText("Make a final accusation correct you win, fail you are out!");
@@ -338,28 +420,53 @@ public class MurderM extends Subject implements WindowListener{
     }
 
 
-
+    /**
+     * Method for making a custom okay or cancel dialog panel
+     *
+     * @param message message to be displayed on dialog
+     * @param title title of the dialog
+     *
+     * @return int of the option made by the user
+     */
     public int displayOkOption(String message, String title) {
         return JOptionPane.showConfirmDialog(frame,
                 message, title,
                 JOptionPane.OK_CANCEL_OPTION);
     }
 
+    /**
+     * Displays a customer message to the frame via a dialog
+     *
+     * @param message message to be displayed
+     */
     public void displayMessage(String message) {
         JOptionPane.showMessageDialog(frame, message);
     }
 
-
+    /**
+     *Pop up dialog that displays who's turn it is at the start of their turn to make sure they have the tablet before continuing
+     *
+     * @param playerName name of player
+     */
     public void displayPlayer(String playerName) {
         JOptionPane.showMessageDialog(frame, "It is " + playerName + "s turn please past them the tablet to them");
     }
 
+
+    /**
+     * Creates a new guess panel containing radio buttons of the list of cards the player can select from.
+     *
+     * @param tempDeck list of cards the player can make guess from
+     *
+     * @return a list of cards that are the players guess
+     */
 
     public ArrayList<Card> makeGuess(ArrayList<Card> tempDeck) {
         ArrayList<Card> toReturn = new ArrayList<>();
 
         ArrayList<Card> buttons = new ArrayList<>();
 
+        //goes through the tempdeck only adding the estate that the player is
         for (Card c : tempDeck) {
             if (c instanceof EstateCard) {
                 if (!c.getName().equals(game.getCurrent().getEstateInString())) {
@@ -369,15 +476,17 @@ public class MurderM extends Subject implements WindowListener{
             buttons.add(c);
 
         }
+        //new guess panel made from the list of cards
         GuessPanel jpane = new GuessPanel(buttons);
 
-
+        //runs untill three cards are selected and they are returned or player can cancel and doesnt count as a guess
         while (true) {
             int result = JOptionPane.showConfirmDialog(null, jpane,
                     "Please Select three cards", JOptionPane.OK_CANCEL_OPTION,
                     JOptionPane.PLAIN_MESSAGE);
             if (result == JOptionPane.OK_OPTION) {
 
+                //makes sure three cards are selected
                 if (!jpane.cardCheck()) {
                     JOptionPane.showMessageDialog(frame,
                             "Select Three Cards",
@@ -395,6 +504,14 @@ public class MurderM extends Subject implements WindowListener{
 
         return toReturn;
     }
+
+    /**
+     * Generates a refute panel for the selected player to make a refute with the cards in there hand
+     *
+     * @param guess list of the current guess
+     * @param p the player makeing the refute
+     * @return a card if they have a correct refute or null if they cant
+     */
 
     public Card refute(ArrayList<Card> guess, Player p) {
         while (true) {
@@ -428,6 +545,13 @@ public class MurderM extends Subject implements WindowListener{
 
     }
 
+    /**
+     * Method for generating an error message pop up dialog
+     *
+     * @param message message to be displayed on the dialog
+     * @param title title of dialog
+     */
+
 
     public void errorMessage(String message, String title) {
         JOptionPane.showMessageDialog(frame,
@@ -436,7 +560,14 @@ public class MurderM extends Subject implements WindowListener{
                 JOptionPane.ERROR_MESSAGE);
     }
 
+
+    /**
+     * Pop up that gets all the player names for the game
+     *
+     *
+     */
     public void setUpPlayerNames() {
+        //game can be played with 3 or 4 players so that is first question asked
         Object[] options = {"3",
                 "4"};
         int n = JOptionPane.showOptionDialog(frame,
@@ -447,51 +578,37 @@ public class MurderM extends Subject implements WindowListener{
                 null,
                 options,
                 options[0]);
-
+        //sets the length of the name array to what user specified
         if (n == JOptionPane.YES_OPTION) {
             names = new String[3];
         } else if (n == JOptionPane.NO_OPTION) {
             names = new String[4];
         }
 
+        //checks that an option has been selected then creates a new panel
         if (names != null) {
             JPanel dialogPanel = new JPanel(new GridBagLayout());
 
+            //builds a border around the panel
             Border titleBorder = BorderFactory.createTitledBorder("Player Information");
             Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
             Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
             dialogPanel.setBorder(combinedBorder);
-            JTextField player1Name = new JTextField(5);
-            JTextField player2Name = new JTextField(5);
-            JTextField player3Name = new JTextField(5);
-            nameInfo.add(player1Name);
-            nameInfo.add(player2Name);
-            nameInfo.add(player3Name);
 
-            player1Name.setText("Harry");
-            player2Name.setText("Leon");
-            player3Name.setText("Terry");
-
-
+            //creates a new TextFieldChecker
             JTextFieldChecker JC = new JTextFieldChecker();
-            JC.addTextField(player1Name);
-            JC.addTextField(player2Name);
-            JC.addTextField(player3Name);
 
 
-            dialogPanel.add(new JLabel("Player 1 Name:"), createGbc(0, 0));
-            dialogPanel.add(player1Name, createGbc(1, 0));
-            dialogPanel.add(new JLabel("Player 2 Name:"), createGbc(0, 1));
-            dialogPanel.add(player2Name, createGbc(1, 1));
-            dialogPanel.add(new JLabel("Player 3 Name:"), createGbc(0, 2));
-            dialogPanel.add(player3Name, createGbc(1, 2));
-            if (names.length == 4) {
-                JTextField player4Name = new JTextField(5);
-                nameInfo.add(player4Name);
-                JC.addTextField(player4Name);
-                dialogPanel.add(new JLabel("Player 4 name:"), createGbc(0, 3));
-                dialogPanel.add(player4Name, createGbc(1, 3));
+           //loops through the number of players creates a new TextField adds them to the Textfield checker
+           //then adds a label and the created grid to the panel
+            for(int i = 0; i < names.length; i++){
+                JTextField name = new JTextField(5);
+                JC.addTextField(name);
+                dialogPanel.add(new JLabel("Player " + (i+1)+  " Name:"), createGbc(0, i));
+                dialogPanel.add(name, createGbc(1, i));
             }
+
+            //stays true until all the players names have been entered
             while (true) {
                 int result = JOptionPane.showConfirmDialog(null, dialogPanel,
                         "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
@@ -499,6 +616,7 @@ public class MurderM extends Subject implements WindowListener{
 
                 if (result == JOptionPane.OK_OPTION) {
 
+                    //checks all textfields have been entered
                     if (!JC.isDataEntered()) {
                         JOptionPane.showMessageDialog(frame,
                                 "All player names must be entered",
@@ -509,19 +627,30 @@ public class MurderM extends Subject implements WindowListener{
                     }
                 }
             }
+            //adds the names of the players to the names array
             for (int i = 0; i < names.length; i++) {
-                names[i] = nameInfo.get(i).getText();
+                names[i] = JC.getTextFields().get(i).getText();
             }
 
         }
     }
 
+
+    /**
+     * Restarts the program by disposing the frame then calling setup again
+     *
+     */
     public void restart() {
         frame.dispose();
         this.game.setGameStarted(false);
         setUpGame();
     }
 
+
+    /**
+     * Method for quitting out of the program checks if user wants to then either exits or does nothing
+     *
+     */
     public void quit() {
         int result = this.displayOkOption("Do you want to Exit?", "Exit Confirmation");
         if (result == 0) {
@@ -531,12 +660,25 @@ public class MurderM extends Subject implements WindowListener{
         }
     }
 
-
+    /**
+     * On open window displays welcome message to users
+     *
+     */
     @Override
     public void windowOpened(WindowEvent e) {
         this.displayMessage("Welcome to Murder Mystery!");
     }
 
+
+
+    /**
+     * Method for quitting out of the program checks if user wants to then either exits or does nothing
+     *
+     * @param x  x location
+     * @param y y location
+     *
+     * @return  a new GridBagConstraints with the specified x and y
+     */
     private static GridBagConstraints createGbc(int x, int y) {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.gridx = x;
@@ -544,16 +686,17 @@ public class MurderM extends Subject implements WindowListener{
         gbc.gridwidth = 1;
         gbc.gridheight = 1;
 
-        gbc.anchor = (x == 0) ? GridBagConstraints.WEST : GridBagConstraints.EAST;
-        gbc.fill = (x == 0) ? GridBagConstraints.BOTH
-                : GridBagConstraints.HORIZONTAL;
-
-        gbc.insets = (x == 0) ? WEST_INSETS : EAST_INSETS;
-        gbc.weightx = (x == 0) ? 0.1 : 1.0;
+        gbc.anchor =  GridBagConstraints.WEST;
+        gbc.fill =  GridBagConstraints.BOTH;
+        gbc.insets =  new Insets(5, 0, 5, 5);
+        gbc.weightx =  0.1;
         gbc.weighty = 1.0;
         return gbc;
     }
 
+
+
+    //unused implemented methods
 
     @Override
     public void windowClosing(WindowEvent e) {
@@ -585,18 +728,6 @@ public class MurderM extends Subject implements WindowListener{
 
     }
 
-    public static void main(String[] args) {
-        setUpGame();
-    }
 
-    private static void setUpGame() {
-
-        Board board = new Board(24, 24);
-        board.setup();
-        BoardCanvas boardCanvas = new BoardCanvas(board, board.getCells(), board.getCellImages(), board.getWeapons(), board.getEstates(), board.getPlayers());
-        boardCanvas.setSize(576, 576);
-        MurderM m = new MurderM(board, boardCanvas);
-        m.guiSetup();
-    }
 }
 
