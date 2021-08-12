@@ -1,11 +1,10 @@
 package Gui;
 
-import java.awt.*;
-import java.awt.event.*;
-import java.util.List;
-import java.util.ArrayList;
 import javax.swing.*;
-import javax.swing.event.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -14,7 +13,7 @@ import javax.swing.event.*;
 
 public class JTextFieldChecker implements DocumentListener {
 
-    private List<JTextField> textFields = new ArrayList<JTextField>();
+    private final List<JTextField> textFields = new ArrayList<>();
 
     public JTextFieldChecker() {
 
@@ -47,14 +46,6 @@ public class JTextFieldChecker implements DocumentListener {
     }
 
 
-    /**
-     * Gets the list of textfields
-     *
-     * @return this's list of textfields
-     */
-    public List<JTextField> getTextFields(){
-        return textFields;
-    }
 
     @Override
     public void insertUpdate(DocumentEvent e) {
