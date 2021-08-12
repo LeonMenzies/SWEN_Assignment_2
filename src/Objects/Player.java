@@ -152,6 +152,9 @@ public class Player implements Cloneable, Drawable {
             return true;
             //Add player into the estate
         } else if ((selected instanceof EstateCell)) {
+            if (Math.abs(this.row - selected.getRow()) + Math.abs(this.col - selected.getCol()) > 1) {
+                return false;
+            }
             EstateCell ec = (EstateCell) selected;
             if (ec.isDoor()) {
                 estateIn = b.getEstate(ec.getName());
