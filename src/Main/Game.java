@@ -359,6 +359,8 @@ public class Game{
 
                 }else{
                     e.addPlayersInEstate(pl);
+                    board.removePlayer(pl);
+                    pl.setEstateIn(e);
                 }
             }
         }

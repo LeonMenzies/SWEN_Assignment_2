@@ -95,111 +95,110 @@ public class Board {
 
             String next = sc.next();
             switch (next) {
-                case "__" -> {
+                case "__":
                     cells[row][col] = new FreeCell(row, col, cellImages.get("__"));
                     col++;
-                }
-                case "GC" -> {
+                    break;
+                case "GC":
                     cells[row][col] = new GreyCell(row, col, cellImages.get("GC"));
                     col++;
-                }
-                case "CC" -> {
+                    break;
+                case "CC":
                     EstateCell cc = new EstateCell(row, col, "Calamity", "Castle", false, cellImages.get("__"));
                     cells[row][col] = cc;
                     estates.get("Calamity Door").addCell(cc);
                     col++;
-                }
-                case "CD" -> {
+                    break;
+                case "CD":
                     EstateCell cd = new EstateCell(row, col, "Calamity", "Door", true, cellImages.get("__"));
                     cells[row][col] = cd;
                     estates.get("Calamity Door").addCell(cd);
                     col++;
-                }
-                case "PP" -> {
+                    break;
+                case "PP":
                     EstateCell pp = new EstateCell(row, col, "Peril", "Palace", false, cellImages.get("__"));
                     cells[row][col] = pp;
                     estates.get("Peril Door").addCell(pp);
                     col++;
-                }
-                case "PD" -> {
+                    break;
+                case "PD":
                     EstateCell pd = new EstateCell(row, col, "Peril", "Door", true, cellImages.get("__"));
                     cells[row][col] = pd;
                     estates.get("Peril Door").addCell(pd);
                     col++;
-                }
-                case "MM" -> {
+                    break;
+                case "MM":
                     EstateCell mm = new EstateCell(row, col, "Manic", "Manor", false, cellImages.get("__"));
                     cells[row][col] = mm;
                     estates.get("Manic Door").addCell(mm);
                     col++;
-                }
-                case "MD" -> {
+                    break;
+                case "MD":
                     EstateCell md = new EstateCell(row, col, "Manic", "Door", true, cellImages.get("__"));
                     cells[row][col] = md;
                     estates.get("Manic Door").addCell(md);
                     col++;
-                }
-                case "HH" -> {
+                    break;
+                case "HH":
                     EstateCell hh = new EstateCell(row, col, "Haunted", "House", false, cellImages.get("__"));
                     cells[row][col] = hh;
                     estates.get("Haunted Door").addCell(hh);
                     col++;
-                }
-                case "HD" -> {
+                    break;
+                case "HD":
                     EstateCell hd = new EstateCell(row, col, "Haunted", "Door", true, cellImages.get("__"));
                     cells[row][col] = hd;
                     estates.get("Haunted Door").addCell(hd);
                     col++;
-                }
-                case "VC" -> {
+                    break;
+                case "VC":
                     EstateCell vc = new EstateCell(row, col, "Villa", "Celia", false, cellImages.get("__"));
                     cells[row][col] = vc;
                     estates.get("Villa Door").addCell(vc);
                     col++;
-                }
-                case "VD" -> {
+                    break;
+                case "VD":
                     EstateCell vd = new EstateCell(row, col, "Villa", "Door", true, cellImages.get("__"));
                     cells[row][col] = vd;
                     estates.get("Villa Door").addCell(vd);
                     col++;
-                }
-                case "VE" -> {
+                    break;
+                case "VE":
                     FreeCell ve = new FreeCell(row, col, cellImages.get("__"));
                     cells[row][col] = ve;
                     estates.get("Villa Door").addExitCell(ve);
                     col++;
-                }
-                case "HE" -> {
+                    break;
+                case "HE":
                     FreeCell he = new FreeCell(row, col, cellImages.get("__"));
                     cells[row][col] = he;
                     estates.get("Haunted Door").addExitCell(he);
                     col++;
-                }
-                case "PE" -> {
+                    break;
+                case "PE":
                     FreeCell pe = new FreeCell(row, col, cellImages.get("__"));
                     cells[row][col] = pe;
                     estates.get("Peril Door").addExitCell(pe);
                     col++;
-                }
-                case "ME" -> {
+                    break;
+                case "ME":
                     FreeCell me = new FreeCell(row, col, cellImages.get("__"));
                     cells[row][col] = me;
                     estates.get("Manic Door").addExitCell(me);
                     col++;
-                }
-                case "CE" -> {
+                    break;
+                case "CE":
                     FreeCell ce = new FreeCell(row, col, cellImages.get("__"));
                     cells[row][col] = ce;
                     estates.get("Calamity Door").addExitCell(ce);
                     col++;
-                }
-                default -> {
+                    break;
+
+                default:
                     row++;
                     col = 0;
-                }
             }
         }
-
     }
 
 
