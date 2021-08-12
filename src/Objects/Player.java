@@ -244,6 +244,10 @@ public class Player implements Cloneable, Drawable {
         return estateIn != null;
     }
 
+    public void setEstateIn(Estate es){
+        this.estateIn = es;
+    }
+
     public String getEstateInString() {
         if (estateIn == null) {
             return "null";
