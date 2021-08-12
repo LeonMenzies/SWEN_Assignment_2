@@ -9,29 +9,27 @@ import Objects.Player;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.plaf.nimbus.NimbusLookAndFeel;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 public class MurderM extends Subject implements WindowListener, ComponentListener {
 
     private Game game = new Game(this);
     private final JFrame frame;
-    private String[] names;
+    private String[] aNames;
+    private String[] cNames;
     private final Board board;
     private final BoardCanvas boardCanvas;
     JPanel handDisplay;
     JPanel guessDisplay;
     JPanel refuteDisplay;
     JLabel stepDisplay;
-    private ArrayList<String> charNames;
+    private final ArrayList<String> charNames;
     JMenuItem i1, i2, i3;
 
 
@@ -44,7 +42,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
         super.addObserver(boardCanvas);
         this.frame = new JFrame();
         charNames = new ArrayList<>();
-        monkeys();
+        setCharNames();
     }
 
     public static void main(String[] args) {
@@ -81,26 +79,30 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
      */
 
     public void setUp() {
-        chooseCharacters(3);
-        //setUpPlayerNames();
-        if (names != null) {
+
+        setUpNumPlayers();
+
+        if (aNames != null) {
             //sets the start button to disabled
+            setUpPlayers(aNames);
             i1.setEnabled(false);
             this.game = new Game(this);
             game.setGameStarted(true);
 
-            game.setUp(names);
+            game.setUp(aNames,cNames);
             notifyObservers();
             game.playGame();
         }
     }
 
-
-    public void monkeys(){
+    /**
+     * Set the char names for character selecting
+     */
+    public void setCharNames() {
         charNames.add("Bert");
-        charNames.add("Terry");
-        charNames.add("leon");
-        charNames.add("Harry");
+        charNames.add("Percy");
+        charNames.add("Lucilla");
+        charNames.add("Malina");
     }
 
     /**
@@ -575,9 +577,9 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
 
     /**
-     * Pop up that gets all the player names for the game
+     * Pop up that gets the number of players
      */
-    public void setUpPlayerNames() {
+    public void setUpNumPlayers() {
         //game can be played with 3 or 4 players so that is first question asked
         Object[] options = {"3",
                 "4"};
@@ -591,56 +593,73 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
                 options[0]);
         //sets the length of the name array to what user specified
         if (n == JOptionPane.YES_OPTION) {
-            names = new String[3];
+            aNames = new String[3];
+            cNames = new String[3];
         } else if (n == JOptionPane.NO_OPTION) {
-            names = new String[4];
+            aNames = new String[4];
+            cNames = new String[4];
         }
 
-        //checks that an option has been selected then creates a new panel
-        if (names != null) {
-            JPanel dialogPanel = new JPanel(new GridBagLayout());
+    }
 
-            //builds a border around the panel
-            Border titleBorder = BorderFactory.createTitledBorder("Player Information");
-            Border emptyBorder = BorderFactory.createEmptyBorder(10, 10, 10, 10);
-            Border combinedBorder = BorderFactory.createCompoundBorder(titleBorder, emptyBorder);
-            dialogPanel.setBorder(combinedBorder);
+    /**
+     * Lets the players select a character and enter there name
+     *
+     * @param numP array of names
+     */
 
-            //creates a new TextFieldChecker
-            JTextFieldChecker JC = new JTextFieldChecker();
+    private void setUpPlayers(String[] numP) {
 
 
-            //loops through the number of players creates a new TextField adds them to the Textfield checker
-            //then adds a label and the created grid to the panel
-            for (int i = 0; i < names.length; i++) {
-                JTextField name = new JTextField(5);
-                JC.addTextField(name);
-                dialogPanel.add(new JLabel("Player " + (i + 1) + " Name:"), createGbc(0, i));
-                dialogPanel.add(name, createGbc(1, i));
-            }
+        JPanel playerDets = new JPanel();
 
-            //stays true until all the players names have been entered
-            while (true) {
-                int result = JOptionPane.showConfirmDialog(null, dialogPanel,
-                        "Please Enter Player Information", JOptionPane.OK_CANCEL_OPTION,
-                        JOptionPane.PLAIN_MESSAGE);
+        JPanel nameLabel = new JPanel();
+        JPanel cP = new JPanel();
+        JTextFieldChecker JC = new JTextFieldChecker();
+        JTextField playerfield = new JTextField();
+        JC.addTextField(playerfield);
+        ButtonGroup bG = new ButtonGroup();
+        ArrayList<JRadioButton> buttons = new ArrayList<>();
 
-                if (result == JOptionPane.OK_OPTION) {
+        playerDets.setLayout(new BoxLayout(playerDets, BoxLayout.PAGE_AXIS));
 
-                    //checks all textfields have been entered
-                    if (!JC.isDataEntered()) {
-                        JOptionPane.showMessageDialog(frame,
-                                "All player names must be entered",
-                                "Name's Error",
-                                JOptionPane.ERROR_MESSAGE);
-                    } else {
-                        break;
+        for (String names : charNames) {
+            JRadioButton characterRadioButton = new JRadioButton(names);
+            bG.add(characterRadioButton);
+            buttons.add(characterRadioButton);
+            cP.add(characterRadioButton);
+        }
+        playerDets.add(cP);
+        nameLabel.setLayout(new BorderLayout());
+        nameLabel.add(new JLabel("Enter your name:"), BorderLayout.WEST);
+        playerDets.add(nameLabel);
+        playerDets.add(playerfield);
+
+
+
+        boolean playerCreated;
+        //goes through the number of play and makes sure they have selected a character and put in a name
+        for (int i = 0; i < numP.length; i++) {
+            playerCreated = false;
+            while (!playerCreated) {
+                playerfield.setText("");
+                bG.clearSelection();
+                while (!JC.isDataEntered()) {
+                    JOptionPane.showConfirmDialog(null, playerDets,
+                            "Please Enter Player " + (i + 1) + " Information", JOptionPane.OK_CANCEL_OPTION,
+                            JOptionPane.PLAIN_MESSAGE);
+                    //goes through button names and the character names and player names to the array
+                    for (JRadioButton button : buttons) {
+                        if (button.isSelected() && playerfield.getText().length() > 0) {
+                            aNames[i] = playerfield.getText();
+                            cNames[i] = button.getText();
+                            button.setEnabled(false);
+                            playerCreated = true;
+                        }
                     }
                 }
-            }
-            //adds the names of the players to the names array
-            for (int i = 0; i < names.length; i++) {
-                names[i] = JC.getTextFields().get(i).getText();
+
+
             }
 
         }
@@ -679,27 +698,14 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
 
 
     /**
-     * Method for quitting out of the program checks if user wants to then either exits or does nothing
-     *
-     * @param x x location
-     * @param y y location
-     * @return a new GridBagConstraints with the specified x and y
+     * Resizing the screen updates the cells on the canvas and the estate cells
      */
-    private static GridBagConstraints createGbc(int x, int y) {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.gridx = x;
-        gbc.gridy = y;
-        gbc.gridwidth = 1;
-        gbc.gridheight = 1;
+    @Override
+    public void componentResized(ComponentEvent e) {
+        boardCanvas.updateSize(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
+        boardCanvas.updateEstates(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
 
-        gbc.anchor = GridBagConstraints.WEST;
-        gbc.fill = GridBagConstraints.BOTH;
-        gbc.insets = new Insets(5, 0, 5, 5);
-        gbc.weightx = 0.1;
-        gbc.weighty = 1.0;
-        return gbc;
     }
-
 
     //unused implemented methods
 
@@ -734,12 +740,7 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
 
-    @Override
-    public void componentResized(ComponentEvent e) {
-        boardCanvas.updateSize(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
-        boardCanvas.updateEstates(boardCanvas.getBounds().width, boardCanvas.getBounds().height);
 
-    }
 
     @Override
     public void componentMoved(ComponentEvent e) {
@@ -757,60 +758,6 @@ public class MurderM extends Subject implements WindowListener, ComponentListene
     }
 
 
-    private void chooseCharacters(int numOfPlayers) {
-        JPanel playerDets = new JPanel();
 
-        JPanel nameLabel = new JPanel();
-        JPanel cP = new JPanel();
-        JTextFieldChecker JC = new JTextFieldChecker();
-        JTextField playerfield = new JTextField();
-        JC.addTextField(playerfield);
-        ButtonGroup bG = new ButtonGroup();
-        ArrayList<JRadioButton> buttons = new ArrayList<>();
-
-        // Set up the character selection popup screen
-        playerDets.setLayout(new BoxLayout(playerDets, BoxLayout.PAGE_AXIS));
-
-        for (String names : charNames) {
-            JRadioButton characterRadioButton = new JRadioButton(names);
-            bG.add(characterRadioButton);
-            buttons.add(characterRadioButton);
-            cP.add(characterRadioButton);
-        }
-        playerDets.add(cP);
-        nameLabel.setLayout(new BorderLayout());
-        nameLabel.add(new JLabel("Enter your name:"), BorderLayout.WEST);
-        playerDets.add(nameLabel);
-        playerDets.add(playerfield);
-
-        // Ask players for their name and the character they pick
-        String playerName;
-
-        boolean playerCreated;
-
-        for (int i = 0; i < numOfPlayers; i++) {
-            playerCreated = false;
-            while (!playerCreated) {
-                playerfield.setText("");
-                bG.clearSelection();
-                while (!JC.isDataEntered()) {
-                    JOptionPane.showConfirmDialog(null, playerDets,
-                            "Please Enter Player "+ (i+1)+ " Information", JOptionPane.OK_CANCEL_OPTION,
-                            JOptionPane.PLAIN_MESSAGE);
-                    playerName = playerfield.getText();
-                    for (JRadioButton button : buttons) {
-                        if (button.isSelected() && playerName.length() > 0) {
-                            //charNames[i] = playerfield.getText();
-                           button.setEnabled(false);
-                            playerCreated = true;
-                        }
-                    }
-                }
-
-
-            }
-
-        }
-    }
 }
 

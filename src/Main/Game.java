@@ -227,16 +227,15 @@ public class Game{
                 guessDeck = gui.makeGuess(tempDeck);
                 if(guessDeck.size() > 0){
                     //checks they have won and sets gameWon
-                   gameWon = checkWin(guessDeck);
-                   if(gameWon){
-                       //if they have won go straight to playgame and announce the victor
-                       playGame();
-                   }else{
-                       //sets the player is out. Displays they are out then checks if everryone is out
-                       gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
-                       currentPlayer.setIsout(true);
-                       gameOver = checkGameOver();
-                      playGame();
+                    gameWon = checkWin(guessDeck);
+                    //if game not won player is out and checks if the all players are out
+                    if (!gameWon) {
+                        gui.displayMessage(currentPlayer.getActualName() + " you are out you can still refute");
+                        currentPlayer.setIsout(true);
+                        gameOver = checkGameOver();
+                    }
+                    gui.resetDisplay();
+                    playGame();
 
                    }
 
@@ -246,7 +245,7 @@ public class Game{
             }
 
         }
-    }
+
 
     /**
      * Goes through every player expect the one making the guess and prompts them to make a refute
@@ -430,11 +429,11 @@ public class Game{
      * Method to set Up the right amount of players in the game either 3 or 4
      * Right amount of players are then added to the player Array for the game
      */
-    public void playerSetUp(String[] names) {
+    public void playerSetUp(String[] aNames, String[] cNames) {
         //scans in a string from the console
         HashMap<String, Image> bert_directions = new HashMap<>();
         HashMap<String, Image> lucilla_directions = new HashMap<>();
-        HashMap<String, Image> maline_directions = new HashMap<>();
+        HashMap<String, Image> malina_directions = new HashMap<>();
         HashMap<String, Image> percy_directions = new HashMap<>();
 
         try {
@@ -448,10 +447,10 @@ public class Game{
             lucilla_directions.put("left", ImageIO.read(new File("src/resources/player_lu_left.png")));
             lucilla_directions.put("right", ImageIO.read(new File("src/resources/player_lu_right.png")));
 
-            maline_directions.put("up", ImageIO.read(new File("src/resources/player_ma_up.png")));
-            maline_directions.put("down", ImageIO.read(new File("src/resources/player_ma_down.png")));
-            maline_directions.put("left", ImageIO.read(new File("src/resources/player_ma_left.png")));
-            maline_directions.put("right", ImageIO.read(new File("src/resources/player_ma_right.png")));
+            malina_directions.put("up", ImageIO.read(new File("src/resources/player_ma_up.png")));
+            malina_directions.put("down", ImageIO.read(new File("src/resources/player_ma_down.png")));
+            malina_directions.put("left", ImageIO.read(new File("src/resources/player_ma_left.png")));
+            malina_directions.put("right", ImageIO.read(new File("src/resources/player_ma_right.png")));
 
             percy_directions.put("up", ImageIO.read(new File("src/resources/player_pe_up.png")));
             percy_directions.put("down", ImageIO.read(new File("src/resources/player_pe_down.png")));
@@ -462,20 +461,23 @@ public class Game{
             System.out.println("Image not found");
         }
 
-
-        //players are then added to the array depending on the amount
-        players.add(new Player("Lucilla", 1, 11, lucilla_directions, names[0], "down"));
-        players.add(new Player("Bert", 9, 1, bert_directions,names[1], "right"));
-        players.add(new Player("Malina", 22, 9, maline_directions,names[2], "up"));
-        playerOrder.add(0);
-        playerOrder.add(1);
-        playerOrder.add(2);
-
-        //4 player gets added in if necessary
-        if (names.length == 4) {
-            playerOrder.add(3);
-            players.add(new Player("Percy", 14, 22, percy_directions,names[3], "left"));
+        //players are added to the array based on what character they picked an there actual names
+        for(int i = 0 ; i < aNames.length; i++){
+            playerOrder.add(i);
+            if(cNames[i].equals("Bert")){
+                players.add(new Player("Bert", 9, 1, bert_directions,aNames[i], "right"));
+            }
+            if(cNames[i].equals("Percy")){
+                players.add(new Player("Percy", 14, 22, percy_directions,aNames[i], "left"));
+            }
+            if(cNames[i].equals("Malina")){
+                players.add(new Player("Malina", 22, 9, malina_directions,aNames[i], "up"));
+            }
+            if(cNames[i].equals("Lucilla")){
+                players.add(new Player("Lucilla", 1, 11, lucilla_directions, aNames[i], "down"));
+            }
         }
+
 
 
         for (Player p : players) {
@@ -488,12 +490,12 @@ public class Game{
     /**
      * Method to setUp the aspects of the game such as player names, all the cards and what the murder circumstance is
      *
-     * @param names list of players actual names
+     * @param aNames list of players actual names
      */
 
 
-    public void setUp(String[] names){
-        playerSetUp(names);
+    public void setUp(String[] aNames,String[] cNames){
+        playerSetUp(aNames,cNames);
         setUpDeck();
         generateMurder();
 
